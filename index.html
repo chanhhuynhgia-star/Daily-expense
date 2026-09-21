@@ -18,7 +18,7 @@
   --bg:#F2F2F7; --card:#FFFFFF; --label:#000000;
   --label2:rgba(60,60,67,.6); --label3:rgba(60,60,67,.3);
   --sep:rgba(60,60,67,.29); --fill:rgba(118,118,128,.12); --fill2:rgba(120,120,128,.2);
-  --blue:#007AFF; --red:#FF3B30; --green:#34C759; --orange:#FF9500;
+  --blue:#007AFF; --blueTint:rgba(0,122,255,.12); --red:#FF3B30; --green:#34C759; --orange:#FF9500;
   --bar:rgba(249,249,249,.84); --material:rgba(255,255,255,.86);
 }
 @media (prefers-color-scheme: dark){
@@ -26,7 +26,7 @@
     --bg:#000000; --card:#1C1C1E; --label:#FFFFFF;
     --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3);
     --sep:rgba(84,84,88,.65); --fill:rgba(118,118,128,.24); --fill2:rgba(120,120,128,.36);
-    --blue:#0A84FF; --red:#FF453A; --green:#30D158; --orange:#FF9F0A;
+    --blue:#0A84FF; --blueTint:rgba(10,132,255,.2); --red:#FF453A; --green:#30D158; --orange:#FF9F0A;
     --bar:rgba(22,22,23,.84); --material:rgba(44,44,46,.9);
   }
 }
@@ -44,8 +44,8 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .view.active{display:flex;flex-direction:column}
 
 /* ---------- Tab ghi ---------- */
-#vAdd{padding:0 16px 10px;max-width:520px;width:100%;margin:0 auto}
-.topbar{display:flex;align-items:center;gap:8px;height:52px}
+#vAdd{padding:0 16px 8px;max-width:520px;width:100%;margin:0 auto}
+.topbar{display:flex;align-items:center;gap:8px;height:52px;flex:none}
 .pill{
   position:relative;display:inline-flex;align-items:center;gap:4px;
   height:32px;padding:0 12px;border:0;border-radius:16px;
@@ -62,7 +62,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .iconbtn{width:36px;height:36px;border:0;border-radius:18px;background:none;display:grid;place-items:center;color:var(--blue)}
 .iconbtn svg{width:24px;height:24px}
 
-.amountWrap{flex:1;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.amountWrap{flex:1;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 .amount{display:flex;align-items:baseline;gap:6px;font-size:64px;font-weight:600;letter-spacing:-.5px;
   font-variant-numeric:tabular-nums;line-height:1.05;transition:color .15s}
 .amount.zero{color:var(--label3)}
@@ -74,20 +74,31 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .note::placeholder{color:var(--label2)}
 .note:focus{outline:none;background:var(--fill2)}
 
-.quick{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:none;min-height:48px;align-items:center}
+.quick{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none;min-height:48px;align-items:center;flex:none}
 .quick::-webkit-scrollbar{display:none}
 .chip{flex:none;height:34px;padding:0 14px;border:0;border-radius:17px;background:var(--card);
   font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;box-shadow:0 0 0 .5px var(--sep)}
 .chip:active{background:var(--fill2)}
+.chip.sug{flex:1;background:var(--blueTint);color:var(--blue);box-shadow:none;font-weight:600;font-size:16px}
+.quick.nudge .chip.sug{animation:nudge .5s 2}
+@keyframes nudge{50%{transform:scale(1.07)}}
 .hint{margin:0;width:100%;text-align:center;font-size:13px;color:var(--label2)}
 
-.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 4px;padding-bottom:8px}
-.cat{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 0;border-radius:14px}
+.cats{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;flex:none}
+.cats::-webkit-scrollbar{display:none}
+.catPage{flex:none;width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;scroll-snap-align:start;align-content:start}
+.cat{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 0;border-radius:14px;min-width:0}
 .cat .ic{width:52px;height:52px;border-radius:26px;display:grid;place-items:center;font-size:25px;transition:transform .12s}
 .cat:active .ic{transform:scale(.9)}
-.cat span:last-child{font-size:12px;color:var(--label)}
+.cat .nm{font-size:12px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
+.catDots{display:flex;justify-content:center;gap:6px;height:14px;align-items:center;flex:none}
+.catDots i{width:6px;height:6px;border-radius:3px;background:var(--label3)}
+.catDots i.on{background:var(--label)}
 
-.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border-top:.5px solid var(--sep);padding-top:6px}
+.padWrap{border-top:.5px solid var(--sep);padding-top:6px;flex:none}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;width:100%;max-width:282px;margin:0 auto}
+.hand-left .keypad{margin-left:0}
+.hand-right .keypad{margin-right:0}
 .key{height:54px;border:0;border-radius:14px;background:none;font-size:28px;font-weight:400;
   display:grid;place-items:center;font-variant-numeric:tabular-nums;user-select:none;-webkit-user-select:none}
 .key:active{background:var(--fill2)}
@@ -137,8 +148,9 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .row .amt{font-size:17px;font-variant-numeric:tabular-nums;text-align:right}
 .row .amt .s{text-align:right}
 .row.selected{background:var(--fill)}
+.row .chev{color:var(--label3);width:8px;flex:none}
 .meter{height:4px;border-radius:2px;background:var(--fill);margin-top:6px;overflow:hidden}
-.meter i{display:block;height:100%;border-radius:2px}
+.meter i{height:100%;border-radius:2px}
 .dayHead{display:flex;justify-content:space-between;margin:18px 32px 6px;font-size:13px;color:var(--label2);font-variant-numeric:tabular-nums}
 .empty{padding:28px 20px;text-align:center;color:var(--label2);font-size:15px}
 .empty button{margin-top:12px}
@@ -157,10 +169,10 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 
 /* ---------- Toast ---------- */
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);transform:translate(-50%,20px);opacity:0;pointer-events:none;
-  display:flex;align-items:center;gap:14px;padding:10px 10px 10px 18px;border-radius:24px;
+  display:flex;align-items:center;gap:14px;padding:10px 10px 10px 18px;border-radius:24px;min-height:50px;
   background:var(--material);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   box-shadow:0 8px 30px rgba(0,0,0,.14),0 0 0 .5px var(--sep);font-size:15px;font-weight:500;
-  transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1.2);white-space:nowrap;z-index:30}
+  transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1.2);white-space:nowrap;z-index:60}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .toast button{border:0;background:var(--fill);color:var(--blue);font-size:15px;font-weight:600;height:30px;padding:0 12px;border-radius:15px}
 
@@ -171,31 +183,52 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
   transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.9,.25,1);z-index:50;
   padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px);max-height:92%;overflow-y:auto}
 .sheet.show{transform:none}
-.sheetBar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56px;padding:0 16px}
+.sheetBar{position:sticky;top:0;z-index:1;background:var(--bg);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56px;padding:0 16px}
 .sheetBar strong{font-size:17px;font-weight:600}
 .sheetBar .textBtn{justify-self:end;font-weight:600;font-size:17px}
+.sheetBar .textBtn.left{justify-self:start;font-weight:400}
 .sheetBody{padding:0 16px}
 .group{background:var(--card);border-radius:12px;overflow:hidden}
 .field{display:block;padding:10px 16px;position:relative}
 .field + .field::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
 .field span{display:block;font-size:13px;color:var(--label2);margin-bottom:2px}
-.field input{width:100%;border:0;background:none;font:inherit;font-size:17px;color:var(--label);padding:2px 0}
+.field input{width:100%;border:0;background:none;font:inherit;font-size:17px;color:var(--label);padding:2px 0;min-height:26px}
 .field input:focus{outline:none}
+.field input.big{font-size:28px;font-weight:600;font-variant-numeric:tabular-nums}
 .foot{font-size:13px;color:var(--label2);margin:8px 16px 16px;line-height:1.4}
+.groupLabel{font-size:13px;color:var(--label2);margin:22px 16px 8px}
 .linkRow{display:block;text-align:center;color:var(--blue);font-size:17px;text-decoration:none;padding:12px}
+.setRow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:48px;padding:6px 16px;border:0;background:none;font-size:17px;text-align:left;position:relative}
+.setRow + .setRow::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
+button.setRow:active{background:var(--fill)}
+.setRow .val{color:var(--label2);display:flex;align-items:center;gap:8px}
+.setRow .seg{margin:0;width:190px}
+.dangerBtn{display:block;width:100%;height:50px;border:0;border-radius:12px;background:var(--card);color:var(--red);font-size:17px;margin-top:24px}
+.catPick{display:flex;flex-wrap:wrap;gap:8px}
+.pickChip{height:36px;padding:0 12px;border:0;border-radius:18px;background:var(--card);font-size:15px;box-shadow:0 0 0 .5px var(--sep)}
+.pickChip.on{background:var(--blue);color:#fff;box-shadow:none}
+
+/* Sửa danh mục */
+.catRow{display:flex;align-items:center;gap:10px;padding:8px 12px;position:relative}
+.catRow + .catRow::before,.emojiPanel + .catRow::before{content:"";position:absolute;top:0;left:58px;right:0;border-top:.5px solid var(--sep)}
+.catRow .ic{flex:none;width:36px;height:36px;border:0;border-radius:18px;font-size:19px;display:grid;place-items:center}
+.catRow input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:17px;color:var(--label);padding:6px 0}
+.catRow input:focus{outline:none}
+.miniBtn{flex:none;width:30px;height:30px;border:0;border-radius:15px;background:var(--fill);display:grid;place-items:center;color:var(--label2)}
+.miniBtn:disabled{opacity:.35}
+.miniBtn.danger{background:var(--red);color:#fff}
+.miniBtn svg{width:14px;height:14px}
+.emojiPanel{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:2px;padding:4px 12px 10px}
+.emojiPanel button{height:38px;border:0;border-radius:10px;background:none;font-size:22px}
+.emojiPanel button:active{background:var(--fill2)}
+.addRow{display:block;width:100%;margin-top:12px;height:48px;border:0;border-radius:12px;background:var(--card);color:var(--blue);font-size:17px}
 
 .asheet{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);max-width:520px;margin:0 auto;z-index:50;
   transform:translateY(120%);transition:transform .3s cubic-bezier(.2,.9,.25,1)}
 .asheet.show{transform:none}
-.agroup,.acancel{background:var(--material);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px}
-.atitle{padding:14px 16px;text-align:center;font-size:13px;color:var(--label2);border-bottom:.5px solid var(--sep)}
-.aaction{display:block;width:100%;height:56px;border:0;background:none;color:var(--blue);font-size:20px}
-.aaction + .aaction{border-top:.5px solid var(--sep)}
-.aaction.danger{color:var(--red)}
-.acancel{display:block;width:100%;height:56px;border:0;margin-top:8px;color:var(--blue);font-size:20px;font-weight:600}
 
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
-@media (max-height:680px){
+@media (max-height:700px){
   .cat .ic{width:44px;height:44px;font-size:21px}
   .key{height:46px}
   .amount{font-size:52px}
@@ -226,7 +259,8 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 
     <div class="quick" id="quick"></div>
     <div class="cats" id="cats"></div>
-    <div class="keypad" id="keypad"></div>
+    <div class="catDots" id="catDots"></div>
+    <div class="padWrap"><div class="keypad" id="keypad"></div></div>
   </section>
 
   <!-- ===== Tab 2: Thống kê ===== -->
@@ -275,30 +309,60 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 
 <div class="overlay" id="overlay"></div>
 
-<div class="sheet" id="settings" role="dialog" aria-label="Kết nối Google Sheet">
-  <div class="sheetBar"><span></span><strong>Kết nối Google Sheet</strong><button class="textBtn" id="closeSettings">Xong</button></div>
+<!-- Cài đặt -->
+<div class="sheet" id="settings" role="dialog" aria-label="Cài đặt">
+  <div class="sheetBar"><span></span><strong>Cài đặt</strong><button class="textBtn" data-close>Xong</button></div>
   <div class="sheetBody">
-    <p class="foot">Dán URL web app lấy từ Google Apps Script. Khi chưa kết nối, các khoản chi vẫn được lưu trên máy này và sẽ tự gửi lên sau.</p>
     <div class="group">
-      <label class="field"><span>URL web app</span><input id="cfgUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <label class="field"><span>URL web app Google Apps Script</span><input id="cfgUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
     </div>
     <p class="foot" id="cfgStatus"></p>
     <button class="primary" id="cfgSave">Lưu và đồng bộ</button>
     <a class="linkRow" id="sheetLink" target="_blank" rel="noopener" hidden>Mở Google Sheet</a>
+
+    <p class="groupLabel">Tùy chỉnh</p>
+    <div class="group">
+      <button class="setRow" id="openCats"><span>Danh mục</span><span class="val"><span id="catCount"></span><svg class="chev" viewBox="0 0 8 14" width="8" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1 1 6 6-6 6"/></svg></span></button>
+      <div class="setRow"><span>Bàn phím</span>
+        <div class="seg" id="handSeg"><button data-h="left">Trái</button><button data-h="center">Giữa</button><button data-h="right">Phải</button></div>
+      </div>
+    </div>
+    <p class="foot">Chọn Trái hoặc Phải để dồn bàn phím số về phía tay bạn cầm máy.</p>
   </div>
 </div>
 
-<div class="asheet" id="asheet" role="dialog">
-  <div class="agroup"><div class="atitle" id="atitle"></div><div id="aactions"></div></div>
-  <button class="acancel" id="acancel">Hủy</button>
+<!-- Sửa danh mục -->
+<div class="sheet" id="catSheet" role="dialog" aria-label="Danh mục">
+  <div class="sheetBar"><button class="textBtn left" data-close>Hủy</button><strong>Danh mục</strong><button class="textBtn" id="catSave">Lưu</button></div>
+  <div class="sheetBody">
+    <p class="foot">Gõ tên, biểu tượng tự đổi theo. Chạm vào biểu tượng để chọn cái khác.</p>
+    <div class="group" id="catRows"></div>
+    <button class="addRow" id="catAdd">Thêm danh mục</button>
+    <p class="foot">Đổi tên một danh mục thì các khoản chi cũ cũng đổi theo. Xóa danh mục không xóa các khoản chi đã ghi.</p>
+  </div>
+</div>
+
+<!-- Sửa khoản chi -->
+<div class="sheet" id="editSheet" role="dialog" aria-label="Sửa khoản chi">
+  <div class="sheetBar"><button class="textBtn left" data-close>Hủy</button><strong>Sửa khoản chi</strong><button class="textBtn" id="editSave">Lưu</button></div>
+  <div class="sheetBody">
+    <div class="group">
+      <label class="field"><span>Số tiền (₫)</span><input id="eAmount" class="big" inputmode="numeric" autocomplete="off"></label>
+      <label class="field"><span>Thời gian</span><input id="eTime" type="datetime-local"></label>
+      <label class="field"><span>Ghi chú</span><input id="eNote" maxlength="80" autocomplete="off" placeholder="Không có"></label>
+    </div>
+    <p class="groupLabel">Danh mục</p>
+    <div class="catPick" id="eCats"></div>
+    <button class="dangerBtn" id="editDelete">Xóa khoản chi</button>
+  </div>
 </div>
 
 <script>
 /* ============================================================
-   Danh mục — sửa tên, biểu tượng, màu ở đây nếu muốn.
-   Tên danh mục được ghi thẳng vào Google Sheet.
+   Danh mục mặc định (lần đầu dùng). Sau đó sửa ngay trong app:
+   Cài đặt > Danh mục. Danh sách được lưu vào trang tính "Danh mục".
    ============================================================ */
-const CATS = [
+const DEFAULT_CATS = [
   { name: 'Ăn uống',   icon: '🍜', color: '#FF9500' },
   { name: 'Cà phê',    icon: '☕', color: '#A2845E' },
   { name: 'Di chuyển', icon: '🛵', color: '#007AFF' },
@@ -308,6 +372,53 @@ const CATS = [
   { name: 'Sức khỏe',  icon: '💊', color: '#34C759' },
   { name: 'Khác',      icon: '📦', color: '#8E8E93' },
 ];
+const PALETTE = ['#FF9500', '#A2845E', '#007AFF', '#FF2D55', '#FFCC00', '#AF52DE', '#34C759', '#5AC8FA', '#FF3B30', '#5856D6', '#30B0C7', '#8E8E93'];
+
+/* Từ khóa (không dấu) → biểu tượng. Nhóm đứng trước được ưu tiên. */
+const ICON_RULES = [
+  [['tra sua'], '🧋'],
+  [['tra no', 'no', 'tra gop', 'vay', 'the tin dung', 'lai'], '💳'],
+  [['ca phe', 'cafe', 'coffee', 'cf', 'cofe'], '☕'],
+  [['tra', 'tra da'], '🍵'],
+  [['nhau', 'bia', 'ruou'], '🍺'],
+  [['em be', 'con', 'con cai', 'bim', 'sua bot', 'tre em'], '👶'],
+  [['di cho', 'cho', 'sieu thi', 'thuc pham', 'rau', 'bach hoa'], '🛒'],
+  [['an', 'an uong', 'an sang', 'an trua', 'an toi', 'an vat', 'com', 'bun', 'pho', 'do an', 'banh mi'], '🍜'],
+  [['xang', 'do xang'], '⛽'],
+  [['may bay', 've may bay', 'du lich', 'khach san', 'resort'], '✈️'],
+  [['gui xe', 'do xe', 've xe', 'bai xe'], '🅿️'],
+  [['sua chua', 'sua xe', 'bao duong', 'sua nha'], '🔧'],
+  [['grab', 'taxi', 'be', 'xanh sm', 'gojek'], '🚕'],
+  [['di chuyen', 'xe', 'xe om', 'xe buyt', 'bus', 'di lai', 'giao thong'], '🛵'],
+  [['quan ao', 'thoi trang', 'giay', 'dep'], '👕'],
+  [['mua sam', 'shopee', 'lazada', 'tiki', 'online', 'tiktok shop'], '🛍️'],
+  [['dien thoai', 'sim', 'nap the', 'nap tien'], '📱'],
+  [['dien', 'hoa don', 'tien dien'], '💡'],
+  [['nuoc', 'tien nuoc'], '🚰'],
+  [['internet', 'wifi', 'mang', 'truyen hinh'], '📶'],
+  [['benh vien', 'kham', 'bac si', 'nha khoa', 'rang'], '🏥'],
+  [['suc khoe', 'thuoc', 'nha thuoc', 'y te'], '💊'],
+  [['nha', 'thue nha', 'tien nha', 'phong tro', 'nha cua'], '🏠'],
+  [['giai tri', 'phim', 'rap', 'xem phim', 'netflix', 'spotify'], '🎬'],
+  [['game'], '🎮'],
+  [['nhac', 'karaoke', 'concert'], '🎤'],
+  [['gym', 'the thao', 'tap', 'yoga', 'boi', 'chay bo', 'bong da', 'cau long'], '🏋️'],
+  [['hoc', 'hoc phi', 'khoa hoc', 'giao duc', 'hoc them'], '🎓'],
+  [['sach', 'truyen'], '📚'],
+  [['thu cung', 'meo', 'cun', 'pet'], '🐾'],
+  [['qua', 'qua tang', 'sinh nhat', 'bieu'], '🎁'],
+  [['hieu hy', 'dam cuoi', 'dam hieu', 'mung', 'dam gio'], '💐'],
+  [['lam dep', 'cat toc', 'toc', 'spa', 'nail', 'goi dau'], '💇'],
+  [['my pham', 'son', 'skincare'], '💄'],
+  [['tiet kiem', 'dau tu', 'chung khoan', 'vang', 'quy'], '🐷'],
+  [['tu thien', 'ung ho', 'cung duong', 'chua'], '🤲'],
+  [['bao hiem'], '🛡️'],
+  [['gia dinh', 'bo me', 'ba me', 'cha me', 'gui nha'], '👨‍👩‍👧'],
+  [['cong viec', 'van phong', 'cong tac'], '💼'],
+  [['cay', 'hoa', 'lam vuon'], '🪴'],
+  [['khac', 'linh tinh'], '📦'],
+];
+const EMOJIS = [...new Set(ICON_RULES.map(r => r[1]).concat(['🍱', '🍗', '🥤', '🍰', '🧃', '🚗', '🚌', '🚆', '🏍️', '🧾', '🎉', '🎨', '📷', '💻', '🧹', '🧴', '👓', '⚽', '🎯', '💰']))];
 
 /* ---------- Tiện ích ---------- */
 const $ = s => document.querySelector(s);
@@ -316,11 +427,23 @@ const short = n => n >= 1e6 ? +(n / 1e6).toFixed(1) + 'tr' : n >= 1e3 ? Math.rou
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const sod = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
-const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const pad2 = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const localInput = d => `${ymd(d)}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 const DOW = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-const catOf = name => CATS.find(c => c.name === name) || { name, icon: '📦', color: '#8E8E93' };
-const tint = hex => hex + '2E';
+const tint = hex => (/^#[0-9a-f]{6}$/i.test(hex) ? hex : '#8E8E93') + '2E';
 const haptic = () => { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} };
+const plain = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'd').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+function autoIcon(name) {
+  const p = ' ' + plain(name) + ' ';
+  if (p.trim() === '') return null;
+  for (const [kws, icon] of ICON_RULES) if (kws.some(k => p.includes(' ' + k + ' '))) return icon;
+  return null;
+}
+function hashColor(name) {
+  let h = 0; for (const ch of String(name)) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+  return PALETTE[h % PALETTE.length];
+}
 function dayLabel(d) {
   const diff = Math.round((sod(new Date()) - sod(d)) / 864e5);
   if (diff === 0) return 'Hôm nay';
@@ -332,18 +455,28 @@ const LS = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
 };
+function cleanCats(list) {
+  return (list || []).filter(c => c && String(c.name || '').trim()).map(c => {
+    const name = String(c.name).trim();
+    return { name, icon: String(c.icon || '').trim() || autoIcon(name) || '📦', color: /^#[0-9a-f]{6}$/i.test(c.color) ? c.color : hashColor(name) };
+  });
+}
 
 /* ---------- Trạng thái ---------- */
-let items = LS.get('ct.items', []);          // tất cả khoản chi (bản sao trên máy)
-let queue = LS.get('ct.queue', []);          // thao tác chờ gửi lên Sheet
+let items = LS.get('ct.items', []);
+let queue = LS.get('ct.queue', []);
 queue.forEach(o => delete o.sending);
+let cats = cleanCats(LS.get('ct.cats', null) || DEFAULT_CATS);
 let cfg = LS.get('ct.cfg', { url: '' });
+let hand = LS.get('ct.hand', 'center');
 let sheetUrl = LS.get('ct.sheetUrl', '');
 let amount = '';
-let pickedDate = null;                        // null = hôm nay
+let pickedDate = null;
 let flushing = false, pulling = false, lastError = '';
 const saveItems = () => LS.set('ct.items', items);
 const saveQueue = () => LS.set('ct.queue', queue);
+const saveCats = () => LS.set('ct.cats', cats);
+const catOf = name => cats.find(c => c.name === name) || { name, icon: autoIcon(name) || '📦', color: '#8E8E93' };
 
 /* ============================================================
    TAB GHI CHI
@@ -357,6 +490,7 @@ function renderAmount() {
   amountEl.classList.toggle('zero', n === 0);
   const len = text.length;
   amountEl.style.fontSize = len <= 7 ? '' : len <= 10 ? '48px' : '38px';
+  renderAssist();
 }
 
 function press(k) {
@@ -375,7 +509,6 @@ function press(k) {
     : `<button class="key${k === '000' ? ' small' : ''}" data-k="${k}">${k}</button>`).join('');
   let holdTimer;
   pad.addEventListener('click', e => { const b = e.target.closest('.key'); if (b) press(b.dataset.k); });
-  // Giữ nút xóa để xóa hết
   pad.addEventListener('pointerdown', e => {
     const b = e.target.closest('[data-k="del"]'); if (!b) return;
     holdTimer = setTimeout(() => { amount = ''; renderAmount(); haptic(); }, 550);
@@ -383,32 +516,73 @@ function press(k) {
   ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => pad.addEventListener(ev, () => clearTimeout(holdTimer)));
 })();
 
-(function buildCats() {
-  $('#cats').innerHTML = CATS.map(c =>
-    `<button class="cat" data-cat="${esc(c.name)}"><span class="ic" style="background:${tint(c.color)}">${c.icon}</span><span>${esc(c.name)}</span></button>`).join('');
-  $('#cats').addEventListener('click', e => {
-    const b = e.target.closest('.cat'); if (!b) return;
-    addExpense(b.dataset.cat, Number(amount || 0), noteEl.value.trim());
-  });
-})();
+function applyHand() {
+  const v = $('#vAdd');
+  v.classList.remove('hand-left', 'hand-right');
+  if (hand !== 'center') v.classList.add('hand-' + hand);
+  document.querySelectorAll('#handSeg button').forEach(b => b.classList.toggle('on', b.dataset.h === hand));
+}
+$('#handSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  hand = b.dataset.h; LS.set('ct.hand', hand); applyHand(); haptic();
+});
 
-function renderQuick() {
+/* ---------- Lưới danh mục (8 ô mỗi trang, vuốt ngang nếu nhiều hơn) ---------- */
+function buildCats() {
+  const pages = [];
+  for (let i = 0; i < cats.length; i += 8) pages.push(cats.slice(i, i + 8));
+  $('#cats').innerHTML = pages.map(p => `<div class="catPage">${p.map(c =>
+    `<button class="cat" data-cat="${esc(c.name)}"><span class="ic" style="background:${tint(c.color)}">${c.icon}</span><span class="nm">${esc(c.name)}</span></button>`).join('')}</div>`).join('');
+  $('#catDots').innerHTML = pages.length > 1 ? pages.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('') : '';
+  $('#cats').scrollLeft = 0;
+  $('#catCount').textContent = cats.length;
+}
+$('#cats').addEventListener('scroll', () => {
+  const el = $('#cats'), i = Math.round(el.scrollLeft / el.clientWidth);
+  document.querySelectorAll('#catDots i').forEach((d, k) => d.classList.toggle('on', k === i));
+}, { passive: true });
+
+let longPressed = false, lpTimer;
+$('#cats').addEventListener('pointerdown', e => {
+  if (!e.target.closest('.cat')) return;
+  longPressed = false;
+  lpTimer = setTimeout(() => { longPressed = true; haptic(); openCatEditor(); }, 600);
+});
+['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => $('#cats').addEventListener(ev, () => clearTimeout(lpTimer)));
+$('#cats').addEventListener('scroll', () => clearTimeout(lpTimer), { passive: true });
+$('#cats').addEventListener('click', e => {
+  const b = e.target.closest('.cat'); if (!b) return;
+  if (longPressed) { longPressed = false; return; }
+  addExpense(b.dataset.cat, Number(amount || 0), noteEl.value.trim());
+});
+
+/* ---------- Gợi ý đơn vị / ghi nhanh ---------- */
+function renderAssist() {
+  const q = $('#quick'), n = Number(amount || 0);
+  q.classList.remove('nudge');
+  if (n > 0 && n < 1000) {
+    const sugs = [];
+    for (let k = 3; k <= 7 && sugs.length < 3; k++) { const v = n * 10 ** k; if (v >= 2000 && v <= 1e10) sugs.push(v); }
+    q.innerHTML = sugs.map(v => `<button class="chip sug" data-set="${v}">${fmt(v)}</button>`).join('');
+    return;
+  }
+  if (n >= 1000) { q.innerHTML = '<p class="hint">Chạm vào danh mục để lưu</p>'; return; }
   const since = Date.now() - 60 * 864e5, m = new Map();
   items.forEach(i => { if (new Date(i.ts) >= since) { const k = i.cat + '|' + i.amount; m.set(k, (m.get(k) || 0) + 1); } });
   const top = [...m.entries()].filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).slice(0, 6);
-  const q = $('#quick');
-  if (!top.length) { q.innerHTML = '<p class="hint">Nhập số tiền, chạm vào danh mục là lưu xong.</p>'; return; }
+  if (!top.length) { q.innerHTML = '<p class="hint">Gõ số tiền, chạm vào danh mục là lưu xong</p>'; return; }
   q.innerHTML = top.map(([k]) => {
-    const [cat, amt] = k.split('|');
-    return `<button class="chip" data-cat="${esc(cat)}" data-amt="${amt}" aria-label="Ghi nhanh ${esc(cat)} ${fmt(+amt)} đồng">${catOf(cat).icon} ${fmt(+amt)}</button>`;
+    const idx = k.lastIndexOf('|'), cat = k.slice(0, idx), amt = +k.slice(idx + 1);
+    return `<button class="chip" data-cat="${esc(cat)}" data-amt="${amt}" aria-label="Ghi nhanh ${esc(cat)} ${fmt(amt)} đồng">${catOf(cat).icon} ${fmt(amt)}</button>`;
   }).join('');
 }
 $('#quick').addEventListener('click', e => {
   const b = e.target.closest('.chip'); if (!b) return;
+  if (b.dataset.set) { amount = b.dataset.set; haptic(); renderAmount(); return; }
   addExpense(b.dataset.cat, Number(b.dataset.amt), noteEl.value.trim());
 });
 
-/* ---------- Chọn ngày (ghi bù khoản chi hôm trước) ---------- */
+/* ---------- Chọn ngày ---------- */
 const dateInput = $('#dateInput');
 function renderDate() {
   $('#dateLabel').textContent = pickedDate ? dayLabel(pickedDate) : 'Hôm nay';
@@ -418,7 +592,7 @@ function renderDate() {
 }
 dateInput.addEventListener('click', () => { try { dateInput.showPicker(); } catch (e) {} });
 dateInput.addEventListener('change', () => {
-  if (!dateInput.value) { pickedDate = null; }
+  if (!dateInput.value) pickedDate = null;
   else {
     const [y, m, d] = dateInput.value.split('-').map(Number);
     const pd = new Date(y, m - 1, d);
@@ -427,11 +601,16 @@ dateInput.addEventListener('change', () => {
   renderDate();
 });
 
-/* ---------- Thêm / xóa ---------- */
+/* ---------- Thêm / sửa / xóa ---------- */
+function shakeAmount() {
+  amountEl.classList.remove('shake'); void amountEl.offsetWidth; amountEl.classList.add('shake');
+  try { navigator.vibrate && navigator.vibrate([10, 40, 10]); } catch (e) {}
+}
 function addExpense(cat, amt, note) {
-  if (!amt) {
-    amountEl.classList.remove('shake'); void amountEl.offsetWidth; amountEl.classList.add('shake');
-    try { navigator.vibrate && navigator.vibrate([10, 40, 10]); } catch (e) {}
+  if (!amt) { shakeAmount(); return; }
+  if (amt < 1000) {           // gõ "25" mà chưa chọn đơn vị
+    shakeAmount();
+    const q = $('#quick'); q.classList.remove('nudge'); void q.offsetWidth; q.classList.add('nudge');
     return;
   }
   const now = new Date();
@@ -439,21 +618,34 @@ function addExpense(cat, amt, note) {
   if (pickedDate) d.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
   const item = { id: uid(), ts: d.toISOString(), amount: amt, cat, note: note || '' };
   items.push(item); saveItems();
-  queue.push({ action: 'add', item }); saveQueue();
+  queue.push({ action: 'add', item: { ...item } }); saveQueue();
   amount = ''; noteEl.value = ''; noteEl.blur();
-  renderAmount(); renderQuick(); haptic();
+  renderAmount(); haptic();
   const extra = pickedDate ? ` (${dayLabel(d).toLowerCase()})` : '';
   toast(`Đã lưu ${catOf(cat).icon} ${fmt(amt)} ₫${extra}`, () => removeExpense(item.id));
   flush();
 }
 
+function updateExpense(id, changes) {
+  const it = items.find(i => i.id === id); if (!it) return;
+  Object.assign(it, changes); saveItems();
+  const addOp = queue.find(o => o.action === 'add' && o.item.id === id && !o.sending);
+  if (addOp) addOp.item = { ...it };
+  else {
+    queue = queue.filter(o => !(o.action === 'update' && o.item.id === id && !o.sending));
+    queue.push({ action: 'update', item: { ...it } });
+  }
+  saveQueue(); renderAssist(); renderStats(); flush();
+}
+
 function removeExpense(id) {
   items = items.filter(i => i.id !== id); saveItems();
-  const qi = queue.findIndex(o => o.action === 'add' && o.item.id === id);
-  if (qi >= 0 && !queue[qi].sending) queue.splice(qi, 1);   // chưa gửi thì bỏ luôn
+  queue = queue.filter(o => !(o.action === 'update' && o.item.id === id && !o.sending));
+  const addIdx = queue.findIndex(o => o.action === 'add' && o.item.id === id);
+  if (addIdx >= 0 && !queue[addIdx].sending) queue.splice(addIdx, 1);
   else queue.push({ action: 'delete', id });
   saveQueue();
-  renderQuick(); renderStats(); flush();
+  renderAssist(); renderStats(); flush();
 }
 
 /* ---------- Toast ---------- */
@@ -472,10 +664,9 @@ $('#toastUndo').addEventListener('click', () => {
   $('#toast').classList.remove('show');
 });
 
-/* Bàn phím vật lý trên máy tính */
 document.addEventListener('keydown', e => {
   if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-  if (!$('#vAdd').classList.contains('active')) return;
+  if (openEl || !$('#vAdd').classList.contains('active')) return;
   if (/^\d$/.test(e.key)) press(e.key);
   else if (e.key === 'Backspace') press('del');
 });
@@ -505,7 +696,8 @@ async function flush() {
     while (queue.length) {
       const op = queue[0];
       op.sending = true;
-      const res = await post({ action: op.action, item: op.item, id: op.id });
+      const { sending, ...body } = op;
+      const res = await post(body);
       if (!res.ok) throw new Error(res.error || 'Máy chủ từ chối');
       queue = queue.filter(o => o !== op); saveQueue();
     }
@@ -525,16 +717,27 @@ async function pull() {
     const r = await fetch(cfg.url);
     const data = await r.json();
     if (!data.ok) throw new Error(data.error || 'Máy chủ từ chối');
-    const pendingAdds = queue.filter(o => o.action === 'add').map(o => o.item);
-    const pendingDels = new Set(queue.filter(o => o.action === 'delete').map(o => o.id));
+    // Gộp dữ liệu máy chủ với các thay đổi chưa gửi
     const map = new Map();
     data.items.forEach(i => map.set(i.id, i));
-    pendingAdds.forEach(i => map.set(i.id, i));
-    items = [...map.values()].filter(i => !pendingDels.has(i.id));
+    queue.filter(o => o.action === 'add' || o.action === 'update').forEach(o => map.set(o.item.id, { ...o.item }));
+    const dels = new Set(queue.filter(o => o.action === 'delete').map(o => o.id));
+    queue.filter(o => o.action === 'renameCat').forEach(o => map.forEach(i => { if (i.cat === o.from) i.cat = o.to; }));
+    items = [...map.values()].filter(i => !dels.has(i.id));
     saveItems();
+
+    if (Array.isArray(data.cats) && !queue.some(o => o.action === 'setCats')) {
+      const remote = cleanCats(data.cats);
+      if (remote.length) {
+        if (JSON.stringify(remote) !== JSON.stringify(cats)) { cats = remote; saveCats(); buildCats(); }
+      } else {
+        queue.push({ action: 'setCats', cats }); saveQueue();   // Sheet chưa có danh mục: gửi danh sách hiện tại lên
+        setTimeout(flush, 0);
+      }
+    }
     if (data.sheetUrl) { sheetUrl = data.sheetUrl; LS.set('ct.sheetUrl', sheetUrl); }
     lastError = '';
-    renderQuick(); renderStats(); renderSettings();
+    renderAssist(); renderStats(); renderSettings();
   } catch (e) {
     lastError = e.message || 'Không tải được dữ liệu';
   } finally {
@@ -597,6 +800,7 @@ function axisLabel(i) {
 const niceMax = v => { const p = Math.pow(10, Math.floor(Math.log10(v))), f = v / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; };
 
 function renderStats() {
+  if (!$('#vStats').classList.contains('active')) return;
   const r = range(period, offset);
   const all = items.filter(i => inRange(i, r.s, r.e));
   const list = catFilter ? all.filter(i => i.cat === catFilter) : all;
@@ -606,7 +810,6 @@ function renderStats() {
   $('#nextP').disabled = offset >= 0;
   $('#sumTotal').innerHTML = `${fmt(total)}<small>₫</small>`;
 
-  // Trung bình mỗi ngày & so sánh cùng kỳ
   const now = new Date(), current = offset === 0;
   const days = current ? Math.max(1, Math.round((sod(now) - r.s) / 864e5) + 1) : Math.round((r.e - r.s) / 864e5);
   const pr = range(period, offset - 1);
@@ -622,19 +825,17 @@ function renderStats() {
   }
   $('#sumMeta').innerHTML = meta;
 
-  // Biểu đồ cột
   const vals = new Array(r.n).fill(0);
   list.forEach(i => { const b = bucketOf(new Date(i.ts), r); if (b >= 0 && b < r.n) vals[b] += i.amount; });
   if (selBucket !== null && selBucket >= r.n) selBucket = null;
   drawChart(vals, r, days);
 
-  // Theo danh mục
   const byCat = new Map();
   all.forEach(i => byCat.set(i.cat, (byCat.get(i.cat) || 0) + i.amount));
   const allTotal = all.reduce((a, i) => a + i.amount, 0);
-  const cats = [...byCat.entries()].sort((a, b) => b[1] - a[1]);
+  const catRows = [...byCat.entries()].sort((a, b) => b[1] - a[1]);
   $('#clearFilter').hidden = !catFilter;
-  $('#catList').innerHTML = cats.length ? cats.map(([name, v]) => {
+  $('#catList').innerHTML = catRows.length ? catRows.map(([name, v]) => {
     const c = catOf(name), pct = allTotal ? v / allTotal * 100 : 0;
     return `<button class="row${catFilter === name ? ' selected' : ''}" data-cat="${esc(name)}">
       <span class="ic" style="background:${tint(c.color)}">${c.icon}</span>
@@ -644,26 +845,25 @@ function renderStats() {
     </button>`;
   }).join('') : `<div class="empty">Chưa có khoản chi nào trong kỳ này.<br><button class="inlineBtn" data-goto="vAdd">Ghi khoản chi</button></div>`;
 
-  // Danh sách giao dịch theo ngày
   const sorted = [...list].sort((a, b) => new Date(b.ts) - new Date(a.ts));
   const LIMIT = 200, shown = sorted.slice(0, LIMIT);
   const groups = new Map();
   shown.forEach(i => { const k = ymd(new Date(i.ts)); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
   let html = '';
   groups.forEach(arr => {
-    const d = new Date(arr[0].ts), sum = arr.reduce((a, i) => a + i.amount, 0);
-    html += `<div class="dayHead"><span>${dayLabel(d)}${dayLabel(d).includes(',') ? '' : `, ${d.getDate()}/${d.getMonth() + 1}`}</span><span>${fmt(sum)} ₫</span></div><div class="card">`;
+    const d = new Date(arr[0].ts), sum = arr.reduce((a, i) => a + i.amount, 0), lbl = dayLabel(d);
+    html += `<div class="dayHead"><span>${lbl}${lbl.includes(',') ? '' : `, ${d.getDate()}/${d.getMonth() + 1}`}</span><span>${fmt(sum)} ₫</span></div><div class="card">`;
     html += arr.map(i => {
       const c = catOf(i.cat), t = new Date(i.ts);
-      const time = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
       return `<button class="row" data-id="${esc(i.id)}">
         <span class="ic" style="background:${tint(c.color)}">${c.icon}</span>
-        <span class="main"><span class="t">${esc(i.note || i.cat)}</span><span class="s">${i.note ? esc(i.cat) + ', ' : ''}${time}</span></span>
-        <span class="amt">${fmt(i.amount)} ₫</span></button>`;
+        <span class="main"><span class="t">${esc(i.note || i.cat)}</span><span class="s">${i.note ? esc(i.cat) + ', ' : ''}${pad2(t.getHours())}:${pad2(t.getMinutes())}</span></span>
+        <span class="amt">${fmt(i.amount)} ₫</span>
+        <svg class="chev" viewBox="0 0 8 14" width="8" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1 1 6 6-6 6"/></svg></button>`;
     }).join('') + '</div>';
   });
   if (sorted.length > LIMIT) html += `<p class="more">Hiển thị ${LIMIT} khoản gần nhất. Xem đầy đủ trong Google Sheet.</p>`;
-  $('#txList').innerHTML = html || (cats.length ? '<div class="empty">Không có khoản chi nào.</div>' : '');
+  $('#txList').innerHTML = html || (catRows.length ? '<div class="empty">Không có khoản chi nào.</div>' : '');
 }
 
 function drawChart(vals, r, days) {
@@ -674,7 +874,6 @@ function drawChart(vals, r, days) {
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Biểu đồ chi tiêu">`;
   s += `<line class="grid" x1="0" x2="${W}" y1="${top}" y2="${top}"/><line class="grid" x1="0" x2="${W}" y1="${top + ch}" y2="${top + ch}"/>`;
   if (maxV > 0) s += `<text x="${W}" y="${top - 4}" text-anchor="end">${short(m)}</text>`;
-  // Đường trung bình (theo ngày khi xem tuần/tháng)
   if (period !== 'year' && maxV > 0) {
     const avg = vals.reduce((a, v) => a + v, 0) / days;
     s += `<line class="avg" x1="0" x2="${W}" y1="${y(avg)}" y2="${y(avg)}"/>`;
@@ -714,11 +913,134 @@ $('#catList').addEventListener('click', e => {
 });
 $('#clearFilter').addEventListener('click', () => { catFilter = null; renderStats(); });
 $('#txList').addEventListener('click', e => {
-  const b = e.target.closest('.row'); if (!b) return;
-  const it = items.find(i => i.id === b.dataset.id); if (!it) return;
-  const d = new Date(it.ts);
-  actionSheet(`${catOf(it.cat).icon} ${fmt(it.amount)} ₫, ${it.cat}${it.note ? ' (' + it.note + ')' : ''}, ${dayLabel(d).toLowerCase()}`,
-    [{ label: 'Xóa khoản chi', danger: true, fn: () => { removeExpense(it.id); toast('Đã xóa khoản chi'); } }]);
+  const b = e.target.closest('.row'); if (b) openEdit(b.dataset.id);
+});
+
+/* ============================================================
+   SỬA KHOẢN CHI
+   ============================================================ */
+let editId = null, editCat = null;
+function openEdit(id) {
+  const it = items.find(i => i.id === id); if (!it) return;
+  editId = id; editCat = it.cat;
+  $('#eAmount').value = fmt(it.amount);
+  $('#eTime').value = localInput(new Date(it.ts));
+  $('#eNote').value = it.note || '';
+  renderEditCats();
+  openSheet('#editSheet');
+}
+function renderEditCats() {
+  const names = cats.map(c => c.name);
+  if (editCat && !names.includes(editCat)) names.push(editCat);
+  $('#eCats').innerHTML = names.map(n => `<button class="pickChip${n === editCat ? ' on' : ''}" data-cat="${esc(n)}">${catOf(n).icon} ${esc(n)}</button>`).join('');
+}
+$('#eCats').addEventListener('click', e => {
+  const b = e.target.closest('.pickChip'); if (!b) return;
+  editCat = b.dataset.cat; haptic(); renderEditCats();
+});
+$('#eAmount').addEventListener('input', e => {
+  const digits = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 11);
+  e.target.value = digits ? fmt(Number(digits)) : '';
+});
+$('#editSave').addEventListener('click', () => {
+  const amt = Number($('#eAmount').value.replace(/\D/g, ''));
+  if (!amt) { $('#eAmount').focus(); return; }
+  const it = items.find(i => i.id === editId); if (!it) { closeSheet(); return; }
+  const tv = $('#eTime').value, t = tv ? new Date(tv) : new Date(it.ts);
+  updateExpense(editId, {
+    amount: amt, cat: editCat,
+    note: $('#eNote').value.trim(),
+    ts: isNaN(t) ? it.ts : t.toISOString(),
+  });
+  closeSheet(); toast('Đã lưu thay đổi');
+});
+$('#editDelete').addEventListener('click', () => {
+  const it = items.find(i => i.id === editId);
+  closeSheet();
+  if (!it) return;
+  const snapshot = { ...it };
+  removeExpense(editId);
+  toast('Đã xóa khoản chi', () => {
+    // Hoàn tác xóa: ghi lại với ID mới
+    const again = { ...snapshot, id: uid() };
+    items.push(again); saveItems();
+    queue.push({ action: 'add', item: { ...again } }); saveQueue();
+    renderAssist(); renderStats(); flush();
+  });
+});
+
+/* ============================================================
+   SỬA DANH MỤC
+   ============================================================ */
+let draft = [], panelAt = -1;
+function openCatEditor() {
+  draft = cats.map(c => ({ ...c, orig: c.name, manual: false }));
+  panelAt = -1; renderCatRows(); openSheet('#catSheet');
+}
+function renderCatRows() {
+  $('#catRows').innerHTML = draft.map((c, i) => `
+    <div class="catRow" data-i="${i}">
+      <button class="ic" data-act="icon" style="background:${tint(c.color)}" aria-label="Đổi biểu tượng">${c.icon}</button>
+      <input value="${esc(c.name)}" data-act="name" maxlength="24" placeholder="Tên danh mục" autocomplete="off">
+      <button class="miniBtn" data-act="up" ${i === 0 ? 'disabled' : ''} aria-label="Đưa lên trên"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12V2M2.5 6.5 7 2l4.5 4.5"/></svg></button>
+      <button class="miniBtn danger" data-act="del" aria-label="Xóa danh mục"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 7h8"/></svg></button>
+    </div>${panelAt === i ? `<div class="emojiPanel" data-i="${i}">${EMOJIS.map(e => `<button data-emoji="${e}">${e}</button>`).join('')}</div>` : ''}`).join('');
+}
+$('#catRows').addEventListener('click', e => {
+  const em = e.target.closest('[data-emoji]');
+  if (em) {
+    const i = Number(em.parentElement.dataset.i);
+    draft[i].icon = em.dataset.emoji; draft[i].manual = true; panelAt = -1; renderCatRows(); return;
+  }
+  const b = e.target.closest('[data-act]'); if (!b || b.tagName === 'INPUT') return;
+  const i = Number(b.closest('.catRow').dataset.i), act = b.dataset.act;
+  if (act === 'icon') panelAt = panelAt === i ? -1 : i;
+  if (act === 'up' && i > 0) { [draft[i - 1], draft[i]] = [draft[i], draft[i - 1]]; panelAt = -1; }
+  if (act === 'del') {
+    if (draft.length <= 1) { toast('Cần giữ ít nhất một danh mục'); return; }
+    draft.splice(i, 1); panelAt = -1;
+  }
+  renderCatRows();
+});
+$('#catRows').addEventListener('input', e => {
+  if (e.target.dataset.act !== 'name') return;
+  const row = e.target.closest('.catRow'), i = Number(row.dataset.i), d = draft[i];
+  d.name = e.target.value;
+  if (!d.manual) {
+    const ic = autoIcon(d.name);
+    if (ic && ic !== d.icon) { d.icon = ic; row.querySelector('.ic').textContent = ic; }
+  }
+});
+$('#catAdd').addEventListener('click', () => {
+  const used = new Set(draft.map(d => d.color));
+  const color = PALETTE.find(c => !used.has(c)) || PALETTE[draft.length % PALETTE.length];
+  draft.push({ name: '', icon: '📦', color, orig: null, manual: false });
+  panelAt = -1; renderCatRows();
+  const inputs = document.querySelectorAll('#catRows input');
+  inputs[inputs.length - 1].focus();
+});
+$('#catSave').addEventListener('click', () => {
+  const list = draft
+    .map(d => ({ ...d, name: d.name.trim() || (d.orig || '') }))
+    .filter(d => d.name);
+  const seen = new Set();
+  for (const d of list) {
+    const k = d.name.toLowerCase();
+    if (seen.has(k)) { toast(`Có hai danh mục cùng tên "${d.name}"`); return; }
+    seen.add(k);
+  }
+  if (!list.length) { toast('Cần giữ ít nhất một danh mục'); return; }
+  list.filter(d => d.orig && d.orig !== d.name).forEach(d => {
+    items.forEach(i => { if (i.cat === d.orig) i.cat = d.name; });
+    queue.forEach(o => { if ((o.action === 'add' || o.action === 'update') && !o.sending && o.item.cat === d.orig) o.item.cat = d.name; });
+    queue.push({ action: 'renameCat', from: d.orig, to: d.name });
+  });
+  cats = list.map(({ name, icon, color }) => ({ name, icon, color }));
+  queue = queue.filter(o => !(o.action === 'setCats' && !o.sending));
+  queue.push({ action: 'setCats', cats });
+  saveCats(); saveItems(); saveQueue();
+  buildCats(); renderAssist(); renderStats(); renderSettings();
+  closeSheet(); toast('Đã lưu danh mục'); flush();
 });
 
 /* ============================================================
@@ -727,43 +1049,39 @@ $('#txList').addEventListener('click', e => {
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === id));
-  if (id === 'vStats') renderStats();
+  renderStats();
 }
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
 
 const overlay = $('#overlay');
 let openEl = null;
-function openSheet(sel) { openEl = $(sel); overlay.classList.add('show'); openEl.classList.add('show'); if (sel === '#settings') renderSettings(); }
-function closeSheet() { overlay.classList.remove('show'); if (openEl) openEl.classList.remove('show'); openEl = null; }
+function openSheet(sel) {
+  if (openEl) openEl.classList.remove('show');
+  openEl = $(sel); overlay.classList.add('show'); openEl.classList.add('show');
+  openEl.scrollTop = 0;
+  if (sel === '#settings') renderSettings();
+}
+function closeSheet() {
+  if (document.activeElement) document.activeElement.blur();
+  overlay.classList.remove('show'); if (openEl) openEl.classList.remove('show'); openEl = null;
+}
 overlay.addEventListener('click', closeSheet);
-$('#acancel').addEventListener('click', closeSheet);
+document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeSheet));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
 
-function actionSheet(title, actions) {
-  $('#atitle').textContent = title;
-  const box = $('#aactions'); box.innerHTML = '';
-  actions.forEach(a => {
-    const b = document.createElement('button');
-    b.className = 'aaction' + (a.danger ? ' danger' : '');
-    b.textContent = a.label;
-    b.onclick = () => { closeSheet(); a.fn(); };
-    box.appendChild(b);
-  });
-  openSheet('#asheet');
-}
-
 function renderSettings() {
-  $('#cfgUrl').value = cfg.url;
+  if (document.activeElement !== $('#cfgUrl')) $('#cfgUrl').value = cfg.url;
   let st = '';
-  if (!cfg.url) st = queue.length ? `${queue.length} khoản chi đang lưu trên máy, sẽ gửi lên khi kết nối.` : 'Chưa kết nối.';
+  if (!cfg.url) st = queue.length ? `${queue.length} thay đổi đang lưu trên máy, sẽ gửi lên khi kết nối.` : 'Chưa kết nối. Các khoản chi vẫn được lưu trên máy này và tự gửi lên sau.';
   else if (lastError) st = `Lỗi gần nhất: ${lastError}. Kiểm tra lại URL và quyền truy cập "Bất kỳ ai" của web app.`;
-  else st = queue.length ? `Còn ${queue.length} thao tác chờ gửi.` : `Đã đồng bộ ${items.length} khoản chi.`;
+  else st = queue.length ? `Còn ${queue.length} thay đổi chờ gửi.` : `Đã đồng bộ ${items.length} khoản chi.`;
   $('#cfgStatus').textContent = st;
   const link = $('#sheetLink');
   link.hidden = !sheetUrl; if (sheetUrl) link.href = sheetUrl;
+  $('#catCount').textContent = cats.length;
 }
 $('#settingsBtn').addEventListener('click', () => openSheet('#settings'));
-$('#closeSettings').addEventListener('click', closeSheet);
+$('#openCats').addEventListener('click', openCatEditor);
 $('#cfgSave').addEventListener('click', async () => {
   cfg = { url: $('#cfgUrl').value.trim() };
   LS.set('ct.cfg', cfg);
@@ -774,7 +1092,7 @@ $('#cfgSave').addEventListener('click', async () => {
 });
 
 /* ---------- Khởi động ---------- */
-renderAmount(); renderDate(); renderQuick(); updateSync(); sync();
+buildCats(); applyHand(); renderAmount(); renderDate(); updateSync(); sync();
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
