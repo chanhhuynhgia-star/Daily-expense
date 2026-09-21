@@ -180,6 +180,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .mic svg{width:24px;height:24px}
 .mic:active{transform:scale(.94)}
 .mic.on{background:var(--red);color:#fff;animation:micPulse 1.2s infinite}
+.mic.wait{background:var(--fill2);color:var(--label2);animation:pulse 1s infinite}
 @keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(255,59,48,.45)}100%{box-shadow:0 0 0 16px rgba(255,59,48,0)}}
 .heard{margin:0;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;color:var(--label);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -363,6 +364,7 @@ button.setRow:active{background:var(--fill)}
     <p class="foot" id="cfgStatus"></p>
     <button class="primary" id="cfgSave">Lưu và đồng bộ</button>
     <a class="linkRow" id="sheetLink" target="_blank" rel="noopener" hidden>Mở Google Sheet</a>
+    <p class="foot" style="text-align:center">Phiên bản 11</p>
 
     <p class="groupLabel">Tùy chỉnh</p>
     <div class="group">
@@ -919,44 +921,116 @@ function parseSpoken(text) {
 }
 
 const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recog = null, listening = false;
+/* Trạng thái: idle → starting (đang bật micro) → live (chấm đỏ, nói được) → idle.
+   Nghe liên tục, tự dừng khi bạn im lặng 1,8 giây sau khi nói, hoặc 8 giây nếu chưa nói gì.
+   Nếu micro tắt ngay mà chưa nghe được gì, app tự bật lại một lần. */
+const VOICE = { SILENCE: 1800, NO_SPEECH: 7000, MAX: 20000 };
+let recog = null, voiceState = 'idle', voiceSession = 0;
+// Safari trên iPhone đôi khi "treo" bộ nhận dạng sau lần dùng đầu: vẫn bật micro nhưng không trả chữ.
+// Cách xử lý: dùng lại một bộ nhận dạng; nếu phát hiện bị treo thì bỏ nó đi, lần sau tạo bộ mới và đổi chế độ nghe.
+let recogBroken = false, voiceContinuous = true;
+function getRecog() {
+  if (!recog || recogBroken) {
+    try { if (recog) recog.abort(); } catch (e) {}
+    recog = new SpeechRec(); recogBroken = false;
+  }
+  recog.lang = 'vi-VN'; recog.interimResults = true; recog.maxAlternatives = 1;
+  recog.continuous = voiceContinuous;
+  return recog;
+}
 function showHeard(text, live) {
   $('#quick').innerHTML = `<p class="heard${live ? '' : ' idle'}">${live ? '<span class="recDot"></span>' : ''}<span>${esc(text)}</span></p>`;
 }
+function setMic(state) {
+  voiceState = state;
+  const b = $('#micBtn');
+  b.classList.toggle('on', state === 'live');
+  b.classList.toggle('wait', state === 'starting');
+}
 function startVoice() {
-  if (listening) { recog.stop(); return; }
-  if (!SpeechRec) {
-    toast('Trình duyệt này chưa hỗ trợ giọng nói. Hãy thử Safari hoặc Chrome.');
-    return;
-  }
-  let finalText = '', lastInterim = '', errMsg = '';
-  recog = new SpeechRec();
-  recog.lang = 'vi-VN'; recog.interimResults = true; recog.continuous = false; recog.maxAlternatives = 1;
-  recog.onstart = () => { listening = true; $('#micBtn').classList.add('on'); haptic(); showHeard('Đang nghe… ví dụ "cà phê 25 nghìn"', true); };
-  recog.onresult = e => {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const tr = e.results[i][0].transcript;
-      if (e.results[i].isFinal) finalText += tr + ' '; else interim += tr;
-    }
-    lastInterim = interim;
-    const shown = (finalText + interim).trim();
-    if (shown) showHeard(shown, true);
+  if (voiceState !== 'idle') { if (recog) { if (voiceState === 'starting') recog.abort(); else recog.stop(); } return; }   // chạm lần nữa: dừng và xử lý câu đã nghe
+  if (!SpeechRec) { toast('Trình duyệt này chưa hỗ trợ giọng nói. Hãy thử Safari hoặc Chrome.'); return; }
+  const session = ++voiceSession;
+  let text = '', errMsg = '', retried = false, startedAt = 0, gotAudio = false, stuck = false;
+  let silenceT, noSpeechT, maxT;
+  const clearTimers = () => { clearTimeout(silenceT); clearTimeout(noSpeechT); clearTimeout(maxT); };
+
+  const begin = () => {
+    const r = getRecog();
+    r.onstart = () => {
+      if (session !== voiceSession) return;
+      startedAt = Date.now(); setMic('live'); haptic();
+      if (!text) showHeard('Mời bạn nói, ví dụ "cà phê 25 nghìn"', true);
+      clearTimeout(noSpeechT);
+      noSpeechT = setTimeout(() => { if (!text) { stuck = gotAudio; r.abort(); } }, VOICE.NO_SPEECH);
+      clearTimeout(maxT);
+      maxT = setTimeout(() => r.stop(), VOICE.MAX);
+    };
+    r.onaudiostart = () => { gotAudio = true; };
+    r.onresult = e => {
+      if (session !== voiceSession) return;
+      // Ghép lại toàn bộ kết quả mỗi lần (tránh bị lặp chữ trên Safari)
+      let all = '';
+      for (let i = 0; i < e.results.length; i++) all += e.results[i][0].transcript + ' ';
+      all = all.replace(/\s+/g, ' ').trim();
+      if (all) { text = all; showHeard(text, true); }
+      clearTimeout(noSpeechT);
+      clearTimeout(silenceT);
+      silenceT = setTimeout(() => r.stop(), VOICE.SILENCE);
+    };
+    r.onerror = e => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') errMsg = 'Chưa có quyền dùng micro. Vào Cài đặt iPhone > Safari > Micro, chọn Cho phép.';
+      else if (e.error === 'no-speech') errMsg = 'Chưa nghe thấy gì, chạm micro rồi nói sau khi thấy chấm đỏ';
+      else if (e.error === 'audio-capture') errMsg = 'Micro đang bận (có thể do cuộc gọi hoặc app khác), thử lại sau nhé';
+      else if (e.error === 'network') errMsg = 'Cần có mạng để nhận dạng giọng nói';
+      else if (!errMsg) errMsg = 'Micro bị ngắt giữa chừng, chạm micro để thử lại';
+    };
+    r.onend = () => {
+      if (session !== voiceSession) return;
+      clearTimers();
+      if (stuck) {
+        // Micro chạy mà không ra chữ: đánh dấu hỏng, thử lại ngay với bộ nhận dạng mới
+        recogBroken = true; voiceContinuous = !voiceContinuous; stuck = false;
+        if (!retried) {
+          retried = true; errMsg = ''; setMic('starting'); showHeard('Micro bị treo, đang bật lại… nói lại giúp nhé', false);
+          setTimeout(() => { if (session === voiceSession) { try { begin(); } catch (err) { finish(); } } }, 300);
+          return;
+        }
+        errMsg = 'Safari chưa trả về chữ. Thử tải lại trang, hoặc chạm ô ghi chú và dùng nút micro trên bàn phím iPhone';
+      }
+      // Micro tắt quá sớm mà chưa nghe được gì: thử bật lại một lần
+      const early = !text && (Date.now() - startedAt < 1500 || !gotAudio);
+      if (early && !retried && !/quyền|mạng|bận/.test(errMsg)) {
+        retried = true; errMsg = ''; setMic('starting'); showHeard('Đang bật lại micro…', false);
+        recogBroken = true;
+        setTimeout(() => { if (session === voiceSession) { try { begin(); } catch (err) { finish(); } } }, 250);
+        return;
+      }
+      finish();
+    };
+    r.start();
   };
-  recog.onerror = e => {
-    errMsg = (e.error === 'not-allowed' || e.error === 'service-not-allowed') ? 'Chưa có quyền dùng micro. Cho phép micro trong cài đặt trình duyệt.'
-      : e.error === 'no-speech' ? 'Không nghe thấy gì, chạm micro để thử lại'
-      : e.error === 'aborted' ? '' : 'Không nhận được giọng nói, thử lại nhé';
-  };
-  recog.onend = () => {
-    listening = false; $('#micBtn').classList.remove('on');
-    const text = (finalText || lastInterim).trim();
+  const finish = () => {
+    clearTimers(); setMic('idle');
     if (text) handleVoice(text);
-    else { renderAssist(); if (errMsg) toast(errMsg); }
+    else { renderAssist(); toast(errMsg || 'Chưa nghe được gì, chạm micro rồi nói sau khi thấy chấm đỏ'); }
   };
-  try { recog.start(); } catch (e) { listening = false; toast('Không bật được micro, thử lại nhé'); }
+
+  setMic('starting');
+  showHeard('Đang bật micro… đợi chấm đỏ rồi nói', false);
+  try { begin(); } catch (e) { setMic('idle'); renderAssist(); toast('Không bật được micro, thử lại nhé'); }
 }
 $('#micBtn').addEventListener('click', startVoice);
+
+// Dự phòng: đọc bằng nút micro trên bàn phím iPhone vào ô ghi chú.
+// Khi chưa gõ số tiền mà ô ghi chú có câu kèm số tiền (vd "cà phê 25 nghìn"), bấm Xong là app hiểu như nói.
+noteEl.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const t = noteEl.value.trim();
+  if (!amount && t && parseSpoken(t).amount) { noteEl.value = ''; noteEl.blur(); handleVoice(t); }
+  else noteEl.blur();
+});
 
 function handleVoice(text) {
   const segs = text.split(/\s+(?:và|với|rồi|thêm|xong)\s+|;|,\s+(?=\D)/i).map(x => x.trim()).filter(Boolean);
@@ -1603,7 +1677,17 @@ $('#cfgSave').addEventListener('click', async () => {
 /* ---------- Khởi động ---------- */
 applySort(); applyHand(); buildCats(); renderAmount(); renderDate(); updateSync(); sync();
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // Mỗi lần mở lại app thì kiểm tra có bản mới trên GitHub không
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+  }).catch(() => {});
+  // Có bản mới thì tải lại trang một lần để dùng ngay (không áp dụng lần cài đầu tiên)
+  let reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloading || voiceState !== 'idle' || openEl) return;
+    reloading = true; location.reload();
+  });
 }
 </script>
 </body>
