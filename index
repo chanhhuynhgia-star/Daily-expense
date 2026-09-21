@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Chi tiêu">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Chi tiêu</title>
+<style>
+:root{
+  --bg:#F2F2F7; --card:#FFFFFF; --label:#000000;
+  --label2:rgba(60,60,67,.6); --label3:rgba(60,60,67,.3);
+  --sep:rgba(60,60,67,.29); --fill:rgba(118,118,128,.12); --fill2:rgba(120,120,128,.2);
+  --blue:#007AFF; --red:#FF3B30; --green:#34C759; --orange:#FF9500;
+  --bar:rgba(249,249,249,.84); --material:rgba(255,255,255,.86);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#000000; --card:#1C1C1E; --label:#FFFFFF;
+    --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3);
+    --sep:rgba(84,84,88,.65); --fill:rgba(118,118,128,.24); --fill2:rgba(120,120,128,.36);
+    --blue:#0A84FF; --red:#FF453A; --green:#30D158; --orange:#FF9F0A;
+    --bar:rgba(22,22,23,.84); --material:rgba(44,44,46,.9);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,sans-serif;
+  background:var(--bg);color:var(--label);-webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;touch-action:manipulation;
+}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.app{height:100%;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.view{flex:1;min-height:0;display:none}
+.view.active{display:flex;flex-direction:column}
+
+/* ---------- Tab ghi ---------- */
+#vAdd{padding:0 16px 10px;max-width:520px;width:100%;margin:0 auto}
+.topbar{display:flex;align-items:center;gap:8px;height:52px}
+.pill{
+  position:relative;display:inline-flex;align-items:center;gap:4px;
+  height:32px;padding:0 12px;border:0;border-radius:16px;
+  background:var(--fill);font-size:15px;font-weight:600;
+}
+.pill.past{background:rgba(255,149,0,.16);color:var(--orange)}
+.pill svg{width:12px;height:12px}
+.pill input{position:absolute;inset:0;opacity:0;width:100%;height:100%;border:0;cursor:pointer}
+.sync{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:0;background:none;
+  font-size:13px;color:var(--label2);padding:6px 4px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--label3)}
+.dot.ok{background:var(--green)} .dot.wait{background:var(--orange)} .dot.busy{background:var(--blue);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.iconbtn{width:36px;height:36px;border:0;border-radius:18px;background:none;display:grid;place-items:center;color:var(--blue)}
+.iconbtn svg{width:24px;height:24px}
+
+.amountWrap{flex:1;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.amount{display:flex;align-items:baseline;gap:6px;font-size:64px;font-weight:600;letter-spacing:-.5px;
+  font-variant-numeric:tabular-nums;line-height:1.05;transition:color .15s}
+.amount.zero{color:var(--label3)}
+.amount .cur{font-size:.5em;font-weight:500;color:var(--label2)}
+.amount.shake{animation:shake .38s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.note{width:100%;max-width:300px;height:36px;border:0;border-radius:10px;background:var(--fill);
+  padding:0 12px;font:inherit;font-size:16px;text-align:center;color:var(--label)}
+.note::placeholder{color:var(--label2)}
+.note:focus{outline:none;background:var(--fill2)}
+
+.quick{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:none;min-height:48px;align-items:center}
+.quick::-webkit-scrollbar{display:none}
+.chip{flex:none;height:34px;padding:0 14px;border:0;border-radius:17px;background:var(--card);
+  font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;box-shadow:0 0 0 .5px var(--sep)}
+.chip:active{background:var(--fill2)}
+.hint{margin:0;width:100%;text-align:center;font-size:13px;color:var(--label2)}
+
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 4px;padding-bottom:8px}
+.cat{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 0;border-radius:14px}
+.cat .ic{width:52px;height:52px;border-radius:26px;display:grid;place-items:center;font-size:25px;transition:transform .12s}
+.cat:active .ic{transform:scale(.9)}
+.cat span:last-child{font-size:12px;color:var(--label)}
+
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border-top:.5px solid var(--sep);padding-top:6px}
+.key{height:54px;border:0;border-radius:14px;background:none;font-size:28px;font-weight:400;
+  display:grid;place-items:center;font-variant-numeric:tabular-nums;user-select:none;-webkit-user-select:none}
+.key:active{background:var(--fill2)}
+.key svg{width:28px;height:28px}
+.key.small{font-size:22px}
+
+/* ---------- Tab thống kê ---------- */
+#vStats{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:24px}
+.statsInner{max-width:620px;width:100%;margin:0 auto}
+.largeTitle{font-size:34px;font-weight:700;letter-spacing:.37px;margin:14px 16px 12px}
+.seg{display:flex;margin:0 16px 16px;padding:2px;border-radius:9px;background:var(--fill)}
+.seg button{flex:1;height:30px;border:0;border-radius:7px;background:none;font-size:13px;font-weight:500}
+.seg button.on{background:var(--card);font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04)}
+@media (prefers-color-scheme: dark){.seg button.on{background:#636366}}
+.card{background:var(--card);border-radius:12px;margin:0 16px}
+.summary{padding:14px 16px 12px}
+.periodNav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.periodNav strong{font-size:15px;font-weight:600;color:var(--label2)}
+.navBtn{width:32px;height:32px;border:0;border-radius:16px;background:var(--fill);display:grid;place-items:center;color:var(--blue)}
+.navBtn:disabled{color:var(--label3)}
+.navBtn svg{width:14px;height:14px}
+.sumTotal{font-size:40px;font-weight:700;letter-spacing:-.3px;font-variant-numeric:tabular-nums;margin-top:6px}
+.sumTotal small{font-size:20px;font-weight:600;color:var(--label2);margin-left:4px}
+.sumMeta{font-size:15px;color:var(--label2);margin-top:2px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.up{color:var(--red)} .down{color:var(--green)}
+.chartCap{font-size:13px;color:var(--label2);margin:16px 0 6px;min-height:18px;font-variant-numeric:tabular-nums}
+.chartCap b{color:var(--label);font-weight:600}
+#chart svg{width:100%;height:auto;display:block;overflow:visible}
+#chart .bar{fill:var(--blue);transition:opacity .15s}
+#chart.hasSel .bar{opacity:.3} #chart .bar.sel{opacity:1}
+#chart .grid{stroke:var(--sep);stroke-width:.5}
+#chart .avg{stroke:var(--orange);stroke-width:1;stroke-dasharray:3 3}
+#chart text{fill:var(--label2);font-size:10px;font-family:inherit}
+#chart .hit{fill:transparent;cursor:pointer}
+
+.sectionHead{display:flex;align-items:baseline;justify-content:space-between;margin:26px 16px 8px}
+.sectionHead h2{font-size:22px;font-weight:700;margin:0;letter-spacing:.35px}
+.textBtn{border:0;background:none;color:var(--blue);font-size:15px;padding:4px 0}
+.row{display:flex;align-items:center;gap:12px;padding:10px 16px;width:100%;border:0;background:none;text-align:left;position:relative}
+.row + .row::before{content:"";position:absolute;top:0;left:60px;right:0;border-top:.5px solid var(--sep)}
+.row:active{background:var(--fill)}
+.row .ic{flex:none;width:32px;height:32px;border-radius:16px;display:grid;place-items:center;font-size:17px}
+.row .main{flex:1;min-width:0}
+.row .t,.row .s,.meter,.meter i{display:block}
+.row .t{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .s{font-size:13px;color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.row .amt{font-size:17px;font-variant-numeric:tabular-nums;text-align:right}
+.row .amt .s{text-align:right}
+.row.selected{background:var(--fill)}
+.meter{height:4px;border-radius:2px;background:var(--fill);margin-top:6px;overflow:hidden}
+.meter i{display:block;height:100%;border-radius:2px}
+.dayHead{display:flex;justify-content:space-between;margin:18px 32px 6px;font-size:13px;color:var(--label2);font-variant-numeric:tabular-nums}
+.empty{padding:28px 20px;text-align:center;color:var(--label2);font-size:15px}
+.empty button{margin-top:12px}
+.primary{display:block;width:100%;height:50px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-size:17px;font-weight:600}
+.primary:active{opacity:.8}
+.inlineBtn{height:36px;padding:0 18px;border:0;border-radius:18px;background:var(--blue);color:#fff;font-size:15px;font-weight:600}
+.more{font-size:13px;color:var(--label2);text-align:center;margin:12px 16px}
+
+/* ---------- Tab bar ---------- */
+.tabbar{display:flex;background:var(--bar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-top:.5px solid var(--sep);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tab{flex:1;border:0;background:none;padding:7px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:10px;font-weight:500;color:#8E8E93}
+.tab.active{color:var(--blue)}
+.tab svg{width:26px;height:26px}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  display:flex;align-items:center;gap:14px;padding:10px 10px 10px 18px;border-radius:24px;
+  background:var(--material);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 8px 30px rgba(0,0,0,.14),0 0 0 .5px var(--sep);font-size:15px;font-weight:500;
+  transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1.2);white-space:nowrap;z-index:30}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{border:0;background:var(--fill);color:var(--blue);font-size:15px;font-weight:600;height:30px;padding:0 12px;border-radius:15px}
+
+/* ---------- Sheets ---------- */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
+.overlay.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;background:var(--bg);border-radius:14px 14px 0 0;
+  transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.9,.25,1);z-index:50;
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px);max-height:92%;overflow-y:auto}
+.sheet.show{transform:none}
+.sheetBar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56px;padding:0 16px}
+.sheetBar strong{font-size:17px;font-weight:600}
+.sheetBar .textBtn{justify-self:end;font-weight:600;font-size:17px}
+.sheetBody{padding:0 16px}
+.group{background:var(--card);border-radius:12px;overflow:hidden}
+.field{display:block;padding:10px 16px;position:relative}
+.field + .field::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
+.field span{display:block;font-size:13px;color:var(--label2);margin-bottom:2px}
+.field input{width:100%;border:0;background:none;font:inherit;font-size:17px;color:var(--label);padding:2px 0}
+.field input:focus{outline:none}
+.foot{font-size:13px;color:var(--label2);margin:8px 16px 16px;line-height:1.4}
+.linkRow{display:block;text-align:center;color:var(--blue);font-size:17px;text-decoration:none;padding:12px}
+
+.asheet{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);max-width:520px;margin:0 auto;z-index:50;
+  transform:translateY(120%);transition:transform .3s cubic-bezier(.2,.9,.25,1)}
+.asheet.show{transform:none}
+.agroup,.acancel{background:var(--material);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px}
+.atitle{padding:14px 16px;text-align:center;font-size:13px;color:var(--label2);border-bottom:.5px solid var(--sep)}
+.aaction{display:block;width:100%;height:56px;border:0;background:none;color:var(--blue);font-size:20px}
+.aaction + .aaction{border-top:.5px solid var(--sep)}
+.aaction.danger{color:var(--red)}
+.acancel{display:block;width:100%;height:56px;border:0;margin-top:8px;color:var(--blue);font-size:20px;font-weight:600}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (max-height:680px){
+  .cat .ic{width:44px;height:44px;font-size:21px}
+  .key{height:46px}
+  .amount{font-size:52px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== Tab 1: Ghi chi tiêu ===== -->
+  <section class="view active" id="vAdd" aria-label="Ghi khoản chi">
+    <header class="topbar">
+      <label class="pill" id="dateBtn">
+        <span id="dateLabel">Hôm nay</span>
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5 6 7.5 9 4.5"/></svg>
+        <input type="date" id="dateInput" aria-label="Chọn ngày chi">
+      </label>
+      <button class="sync" id="syncBtn" aria-label="Đồng bộ"><span class="dot" id="syncDot"></span><span id="syncText">Chưa kết nối</span></button>
+      <button class="iconbtn" id="settingsBtn" aria-label="Cài đặt">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </header>
+
+    <div class="amountWrap">
+      <div class="amount zero" id="amount" aria-live="polite"><span id="amountNum">0</span><span class="cur">₫</span></div>
+      <input id="note" class="note" placeholder="Thêm ghi chú" maxlength="80" autocomplete="off" enterkeyhint="done">
+    </div>
+
+    <div class="quick" id="quick"></div>
+    <div class="cats" id="cats"></div>
+    <div class="keypad" id="keypad"></div>
+  </section>
+
+  <!-- ===== Tab 2: Thống kê ===== -->
+  <section class="view" id="vStats" aria-label="Thống kê">
+    <div class="statsInner">
+      <h1 class="largeTitle">Thống kê</h1>
+      <div class="seg" id="seg" role="tablist">
+        <button data-p="week" class="on">Tuần</button>
+        <button data-p="month">Tháng</button>
+        <button data-p="year">Năm</button>
+      </div>
+
+      <div class="card summary">
+        <div class="periodNav">
+          <button class="navBtn" id="prevP" aria-label="Kỳ trước"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 4 7l5 5"/></svg></button>
+          <strong id="periodLabel">Tuần này</strong>
+          <button class="navBtn" id="nextP" aria-label="Kỳ sau"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 2 5 5-5 5"/></svg></button>
+        </div>
+        <div class="sumTotal" id="sumTotal">0<small>₫</small></div>
+        <div class="sumMeta" id="sumMeta"></div>
+        <div class="chartCap" id="chartCap"></div>
+        <div id="chart"></div>
+      </div>
+
+      <div class="sectionHead"><h2>Theo danh mục</h2><button class="textBtn" id="clearFilter" hidden>Bỏ lọc</button></div>
+      <div class="card" id="catList"></div>
+
+      <div class="sectionHead"><h2>Các khoản chi</h2></div>
+      <div id="txList"></div>
+    </div>
+  </section>
+
+  <nav class="tabbar" aria-label="Điều hướng">
+    <button class="tab active" data-view="vAdd">
+      <svg viewBox="0 0 26 26" fill="currentColor"><path d="M13 2.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21Zm1 14.5a1 1 0 1 1-2 0v-3h-3a1 1 0 1 1 0-2h3V9a1 1 0 1 1 2 0v3h3a1 1 0 1 1 0 2h-3v3Z"/></svg>
+      Ghi chi
+    </button>
+    <button class="tab" data-view="vStats">
+      <svg viewBox="0 0 26 26" fill="currentColor"><rect x="3" y="13" width="5" height="10" rx="1.5"/><rect x="10.5" y="4" width="5" height="19" rx="1.5"/><rect x="18" y="9" width="5" height="14" rx="1.5"/></svg>
+      Thống kê
+    </button>
+  </nav>
+</div>
+
+<div class="toast" id="toast" role="status"><span id="toastText"></span><button id="toastUndo">Hoàn tác</button></div>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="sheet" id="settings" role="dialog" aria-label="Kết nối Google Sheet">
+  <div class="sheetBar"><span></span><strong>Kết nối Google Sheet</strong><button class="textBtn" id="closeSettings">Xong</button></div>
+  <div class="sheetBody">
+    <p class="foot">Dán URL web app lấy từ Google Apps Script và mã bảo mật bạn đã đặt trong file Code.gs. Khi chưa kết nối, các khoản chi vẫn được lưu trên máy này và sẽ tự gửi lên sau.</p>
+    <div class="group">
+      <label class="field"><span>URL web app</span><input id="cfgUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+      <label class="field"><span>Mã bảo mật</span><input id="cfgToken" type="text" placeholder="Giống TOKEN trong Code.gs" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    </div>
+    <p class="foot" id="cfgStatus"></p>
+    <button class="primary" id="cfgSave">Lưu và đồng bộ</button>
+    <a class="linkRow" id="sheetLink" target="_blank" rel="noopener" hidden>Mở Google Sheet</a>
+  </div>
+</div>
+
+<div class="asheet" id="asheet" role="dialog">
+  <div class="agroup"><div class="atitle" id="atitle"></div><div id="aactions"></div></div>
+  <button class="acancel" id="acancel">Hủy</button>
+</div>
+
+<script>
+/* ============================================================
+   Danh mục — sửa tên, biểu tượng, màu ở đây nếu muốn.
+   Tên danh mục được ghi thẳng vào Google Sheet.
+   ============================================================ */
+const CATS = [
+  { name: 'Ăn uống',   icon: '🍜', color: '#FF9500' },
+  { name: 'Cà phê',    icon: '☕', color: '#A2845E' },
+  { name: 'Di chuyển', icon: '🛵', color: '#007AFF' },
+  { name: 'Mua sắm',   icon: '🛍️', color: '#FF2D55' },
+  { name: 'Hóa đơn',   icon: '💡', color: '#FFCC00' },
+  { name: 'Giải trí',  icon: '🎬', color: '#AF52DE' },
+  { name: 'Sức khỏe',  icon: '💊', color: '#34C759' },
+  { name: 'Khác',      icon: '📦', color: '#8E8E93' },
+];
+
+/* ---------- Tiện ích ---------- */
+const $ = s => document.querySelector(s);
+const fmt = n => Math.round(n).toLocaleString('vi-VN');
+const short = n => n >= 1e6 ? +(n / 1e6).toFixed(1) + 'tr' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(n);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const sod = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const DOW = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+const catOf = name => CATS.find(c => c.name === name) || { name, icon: '📦', color: '#8E8E93' };
+const tint = hex => hex + '2E';
+const haptic = () => { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} };
+function dayLabel(d) {
+  const diff = Math.round((sod(new Date()) - sod(d)) / 864e5);
+  if (diff === 0) return 'Hôm nay';
+  if (diff === 1) return 'Hôm qua';
+  const x = new Date(d);
+  return `${DOW[x.getDay()]}, ${x.getDate()}/${x.getMonth() + 1}`;
+}
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+
+/* ---------- Trạng thái ---------- */
+let items = LS.get('ct.items', []);          // tất cả khoản chi (bản sao trên máy)
+let queue = LS.get('ct.queue', []);          // thao tác chờ gửi lên Sheet
+queue.forEach(o => delete o.sending);
+let cfg = LS.get('ct.cfg', { url: '', token: '' });
+let sheetUrl = LS.get('ct.sheetUrl', '');
+let amount = '';
+let pickedDate = null;                        // null = hôm nay
+let flushing = false, pulling = false, lastError = '';
+const saveItems = () => LS.set('ct.items', items);
+const saveQueue = () => LS.set('ct.queue', queue);
+
+/* ============================================================
+   TAB GHI CHI
+   ============================================================ */
+const amountEl = $('#amount'), amountNum = $('#amountNum'), noteEl = $('#note');
+
+function renderAmount() {
+  const n = Number(amount || 0);
+  const text = fmt(n);
+  amountNum.textContent = text;
+  amountEl.classList.toggle('zero', n === 0);
+  const len = text.length;
+  amountEl.style.fontSize = len <= 7 ? '' : len <= 10 ? '48px' : '38px';
+}
+
+function press(k) {
+  haptic();
+  if (k === 'del') amount = amount.slice(0, -1);
+  else if (!amount && (k === '0' || k === '000')) return;
+  else if ((amount + k).length <= 11) amount += k;
+  renderAmount();
+}
+
+(function buildKeypad() {
+  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '0', 'del'];
+  const pad = $('#keypad');
+  pad.innerHTML = keys.map(k => k === 'del'
+    ? `<button class="key" data-k="del" aria-label="Xóa"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M10 6h13a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10l-7-8 7-8Z"/><path d="m13 11 6 6m0-6-6 6"/></svg></button>`
+    : `<button class="key${k === '000' ? ' small' : ''}" data-k="${k}">${k}</button>`).join('');
+  let holdTimer;
+  pad.addEventListener('click', e => { const b = e.target.closest('.key'); if (b) press(b.dataset.k); });
+  // Giữ nút xóa để xóa hết
+  pad.addEventListener('pointerdown', e => {
+    const b = e.target.closest('[data-k="del"]'); if (!b) return;
+    holdTimer = setTimeout(() => { amount = ''; renderAmount(); haptic(); }, 550);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => pad.addEventListener(ev, () => clearTimeout(holdTimer)));
+})();
+
+(function buildCats() {
+  $('#cats').innerHTML = CATS.map(c =>
+    `<button class="cat" data-cat="${esc(c.name)}"><span class="ic" style="background:${tint(c.color)}">${c.icon}</span><span>${esc(c.name)}</span></button>`).join('');
+  $('#cats').addEventListener('click', e => {
+    const b = e.target.closest('.cat'); if (!b) return;
+    addExpense(b.dataset.cat, Number(amount || 0), noteEl.value.trim());
+  });
+})();
+
+function renderQuick() {
+  const since = Date.now() - 60 * 864e5, m = new Map();
+  items.forEach(i => { if (new Date(i.ts) >= since) { const k = i.cat + '|' + i.amount; m.set(k, (m.get(k) || 0) + 1); } });
+  const top = [...m.entries()].filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const q = $('#quick');
+  if (!top.length) { q.innerHTML = '<p class="hint">Nhập số tiền, chạm vào danh mục là lưu xong.</p>'; return; }
+  q.innerHTML = top.map(([k]) => {
+    const [cat, amt] = k.split('|');
+    return `<button class="chip" data-cat="${esc(cat)}" data-amt="${amt}" aria-label="Ghi nhanh ${esc(cat)} ${fmt(+amt)} đồng">${catOf(cat).icon} ${fmt(+amt)}</button>`;
+  }).join('');
+}
+$('#quick').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  addExpense(b.dataset.cat, Number(b.dataset.amt), noteEl.value.trim());
+});
+
+/* ---------- Chọn ngày (ghi bù khoản chi hôm trước) ---------- */
+const dateInput = $('#dateInput');
+function renderDate() {
+  $('#dateLabel').textContent = pickedDate ? dayLabel(pickedDate) : 'Hôm nay';
+  $('#dateBtn').classList.toggle('past', !!pickedDate);
+  dateInput.max = ymd(new Date());
+  dateInput.value = ymd(pickedDate || new Date());
+}
+dateInput.addEventListener('click', () => { try { dateInput.showPicker(); } catch (e) {} });
+dateInput.addEventListener('change', () => {
+  if (!dateInput.value) { pickedDate = null; }
+  else {
+    const [y, m, d] = dateInput.value.split('-').map(Number);
+    const pd = new Date(y, m - 1, d);
+    pickedDate = sod(pd).getTime() === sod(new Date()).getTime() ? null : pd;
+  }
+  renderDate();
+});
+
+/* ---------- Thêm / xóa ---------- */
+function addExpense(cat, amt, note) {
+  if (!amt) {
+    amountEl.classList.remove('shake'); void amountEl.offsetWidth; amountEl.classList.add('shake');
+    try { navigator.vibrate && navigator.vibrate([10, 40, 10]); } catch (e) {}
+    return;
+  }
+  const now = new Date();
+  const d = pickedDate ? new Date(pickedDate) : now;
+  if (pickedDate) d.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+  const item = { id: uid(), ts: d.toISOString(), amount: amt, cat, note: note || '' };
+  items.push(item); saveItems();
+  queue.push({ action: 'add', item }); saveQueue();
+  amount = ''; noteEl.value = ''; noteEl.blur();
+  renderAmount(); renderQuick(); haptic();
+  const extra = pickedDate ? ` (${dayLabel(d).toLowerCase()})` : '';
+  toast(`Đã lưu ${catOf(cat).icon} ${fmt(amt)} ₫${extra}`, () => removeExpense(item.id));
+  flush();
+}
+
+function removeExpense(id) {
+  items = items.filter(i => i.id !== id); saveItems();
+  const qi = queue.findIndex(o => o.action === 'add' && o.item.id === id);
+  if (qi >= 0 && !queue[qi].sending) queue.splice(qi, 1);   // chưa gửi thì bỏ luôn
+  else queue.push({ action: 'delete', id });
+  saveQueue();
+  renderQuick(); renderStats(); flush();
+}
+
+/* ---------- Toast ---------- */
+let toastTimer, undoFn = null;
+function toast(text, onUndo) {
+  $('#toastText').textContent = text;
+  undoFn = onUndo || null;
+  $('#toastUndo').hidden = !onUndo;
+  $('#toast').classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $('#toast').classList.remove('show'), 3500);
+}
+$('#toastUndo').addEventListener('click', () => {
+  if (undoFn) undoFn();
+  undoFn = null;
+  $('#toast').classList.remove('show');
+});
+
+/* Bàn phím vật lý trên máy tính */
+document.addEventListener('keydown', e => {
+  if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+  if (!$('#vAdd').classList.contains('active')) return;
+  if (/^\d$/.test(e.key)) press(e.key);
+  else if (e.key === 'Backspace') press('del');
+});
+
+/* ============================================================
+   ĐỒNG BỘ GOOGLE SHEET
+   ============================================================ */
+function updateSync() {
+  const dot = $('#syncDot'), txt = $('#syncText');
+  dot.className = 'dot';
+  if (!cfg.url) { txt.textContent = queue.length ? `Chưa kết nối (${queue.length})` : 'Chưa kết nối'; return; }
+  if (flushing || pulling) { dot.classList.add('busy'); txt.textContent = 'Đang đồng bộ'; return; }
+  if (queue.length) { dot.classList.add('wait'); txt.textContent = `Chờ gửi ${queue.length}`; return; }
+  dot.classList.add('ok'); txt.textContent = 'Đã đồng bộ';
+}
+
+async function post(body) {
+  // Gửi dạng text/plain để tránh CORS preflight với Apps Script
+  const r = await fetch(cfg.url, { method: 'POST', body: JSON.stringify(body) });
+  return r.json();
+}
+
+async function flush() {
+  if (flushing || !cfg.url || !queue.length || !navigator.onLine) { updateSync(); return; }
+  flushing = true; updateSync();
+  try {
+    while (queue.length) {
+      const op = queue[0];
+      op.sending = true;
+      const res = await post({ token: cfg.token, action: op.action, item: op.item, id: op.id });
+      if (!res.ok) throw new Error(res.error || 'Máy chủ từ chối');
+      queue = queue.filter(o => o !== op); saveQueue();
+    }
+    lastError = '';
+  } catch (e) {
+    lastError = e.message || 'Không gửi được';
+    queue.forEach(o => delete o.sending); saveQueue();
+  } finally {
+    flushing = false; updateSync();
+  }
+}
+
+async function pull() {
+  if (!cfg.url || !navigator.onLine) return;
+  pulling = true; updateSync();
+  try {
+    const sep = cfg.url.includes('?') ? '&' : '?';
+    const r = await fetch(cfg.url + sep + 'token=' + encodeURIComponent(cfg.token));
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'Máy chủ từ chối');
+    const pendingAdds = queue.filter(o => o.action === 'add').map(o => o.item);
+    const pendingDels = new Set(queue.filter(o => o.action === 'delete').map(o => o.id));
+    const map = new Map();
+    data.items.forEach(i => map.set(i.id, i));
+    pendingAdds.forEach(i => map.set(i.id, i));
+    items = [...map.values()].filter(i => !pendingDels.has(i.id));
+    saveItems();
+    if (data.sheetUrl) { sheetUrl = data.sheetUrl; LS.set('ct.sheetUrl', sheetUrl); }
+    lastError = '';
+    renderQuick(); renderStats(); renderSettings();
+  } catch (e) {
+    lastError = e.message || 'Không tải được dữ liệu';
+  } finally {
+    pulling = false; updateSync();
+  }
+}
+
+async function sync() { await flush(); await pull(); }
+
+$('#syncBtn').addEventListener('click', () => { if (!cfg.url) openSheet('#settings'); else sync(); });
+window.addEventListener('online', sync);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') { renderDate(); sync(); }
+});
+
+/* ============================================================
+   TAB THỐNG KÊ
+   ============================================================ */
+let period = 'week', offset = 0, selBucket = null, catFilter = null;
+
+function range(p, off) {
+  const now = new Date();
+  if (p === 'week') {
+    const s = sod(now); s.setDate(s.getDate() - (s.getDay() + 6) % 7 + off * 7);
+    const e = new Date(s); e.setDate(s.getDate() + 7);
+    return { s, e, n: 7 };
+  }
+  if (p === 'month') {
+    const s = new Date(now.getFullYear(), now.getMonth() + off, 1);
+    const e = new Date(s.getFullYear(), s.getMonth() + 1, 1);
+    return { s, e, n: Math.round((e - s) / 864e5) };
+  }
+  const s = new Date(now.getFullYear() + off, 0, 1), e = new Date(now.getFullYear() + off + 1, 0, 1);
+  return { s, e, n: 12 };
+}
+const inRange = (i, s, e) => { const t = new Date(i.ts); return t >= s && t < e; };
+const bucketOf = (t, r) => period === 'year' ? t.getMonth() : Math.round((sod(t) - r.s) / 864e5);
+
+function periodLabel(r) {
+  const dm = d => `${d.getDate()}/${d.getMonth() + 1}`;
+  if (period === 'week') {
+    if (offset === 0) return 'Tuần này';
+    if (offset === -1) return 'Tuần trước';
+    const last = new Date(r.e); last.setDate(last.getDate() - 1);
+    return `${dm(r.s)} – ${dm(last)}`;
+  }
+  if (period === 'month') return offset === 0 ? 'Tháng này' : `Tháng ${r.s.getMonth() + 1}/${r.s.getFullYear()}`;
+  return offset === 0 ? 'Năm nay' : `Năm ${r.s.getFullYear()}`;
+}
+function bucketName(i, r) {
+  if (period === 'year') return `Tháng ${i + 1}`;
+  const d = new Date(r.s); d.setDate(d.getDate() + i);
+  return dayLabel(d);
+}
+function axisLabel(i) {
+  if (period === 'week') return ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'][i];
+  if (period === 'year') return 'T' + (i + 1);
+  const d = i + 1; return (d === 1 || d % 5 === 0) ? String(d) : '';
+}
+const niceMax = v => { const p = Math.pow(10, Math.floor(Math.log10(v))), f = v / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; };
+
+function renderStats() {
+  const r = range(period, offset);
+  const all = items.filter(i => inRange(i, r.s, r.e));
+  const list = catFilter ? all.filter(i => i.cat === catFilter) : all;
+  const total = list.reduce((a, i) => a + i.amount, 0);
+
+  $('#periodLabel').textContent = periodLabel(r) + (catFilter ? ` · ${catFilter}` : '');
+  $('#nextP').disabled = offset >= 0;
+  $('#sumTotal').innerHTML = `${fmt(total)}<small>₫</small>`;
+
+  // Trung bình mỗi ngày & so sánh cùng kỳ
+  const now = new Date(), current = offset === 0;
+  const days = current ? Math.max(1, Math.round((sod(now) - r.s) / 864e5) + 1) : Math.round((r.e - r.s) / 864e5);
+  const pr = range(period, offset - 1);
+  const pEnd = current ? new Date(pr.s.getTime() + (now - r.s)) : pr.e;
+  const prevTotal = items.filter(i => inRange(i, pr.s, pEnd) && (!catFilter || i.cat === catFilter)).reduce((a, i) => a + i.amount, 0);
+  const unit = { week: 'tuần', month: 'tháng', year: 'năm' }[period];
+  let meta = `<span>Trung bình ${fmt(total / days)} ₫/ngày</span>`;
+  if (prevTotal > 0) {
+    const pct = Math.round((total - prevTotal) / prevTotal * 100);
+    const cls = pct > 0 ? 'up' : pct < 0 ? 'down' : '';
+    const arrow = pct > 0 ? '▲' : pct < 0 ? '▼' : '';
+    meta += `<span class="${cls}">${arrow} ${Math.abs(pct)}% so với ${current ? 'cùng kỳ ' : ''}${unit} trước</span>`;
+  }
+  $('#sumMeta').innerHTML = meta;
+
+  // Biểu đồ cột
+  const vals = new Array(r.n).fill(0);
+  list.forEach(i => { const b = bucketOf(new Date(i.ts), r); if (b >= 0 && b < r.n) vals[b] += i.amount; });
+  if (selBucket !== null && selBucket >= r.n) selBucket = null;
+  drawChart(vals, r, days);
+
+  // Theo danh mục
+  const byCat = new Map();
+  all.forEach(i => byCat.set(i.cat, (byCat.get(i.cat) || 0) + i.amount));
+  const allTotal = all.reduce((a, i) => a + i.amount, 0);
+  const cats = [...byCat.entries()].sort((a, b) => b[1] - a[1]);
+  $('#clearFilter').hidden = !catFilter;
+  $('#catList').innerHTML = cats.length ? cats.map(([name, v]) => {
+    const c = catOf(name), pct = allTotal ? v / allTotal * 100 : 0;
+    return `<button class="row${catFilter === name ? ' selected' : ''}" data-cat="${esc(name)}">
+      <span class="ic" style="background:${tint(c.color)}">${c.icon}</span>
+      <span class="main"><span class="t">${esc(name)}</span>
+        <span class="meter"><i style="width:${pct.toFixed(1)}%;background:${c.color}"></i></span></span>
+      <span class="amt">${fmt(v)} ₫<span class="s">${pct < 1 && pct > 0 ? '<1' : Math.round(pct)}%</span></span>
+    </button>`;
+  }).join('') : `<div class="empty">Chưa có khoản chi nào trong kỳ này.<br><button class="inlineBtn" data-goto="vAdd">Ghi khoản chi</button></div>`;
+
+  // Danh sách giao dịch theo ngày
+  const sorted = [...list].sort((a, b) => new Date(b.ts) - new Date(a.ts));
+  const LIMIT = 200, shown = sorted.slice(0, LIMIT);
+  const groups = new Map();
+  shown.forEach(i => { const k = ymd(new Date(i.ts)); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
+  let html = '';
+  groups.forEach(arr => {
+    const d = new Date(arr[0].ts), sum = arr.reduce((a, i) => a + i.amount, 0);
+    html += `<div class="dayHead"><span>${dayLabel(d)}${dayLabel(d).includes(',') ? '' : `, ${d.getDate()}/${d.getMonth() + 1}`}</span><span>${fmt(sum)} ₫</span></div><div class="card">`;
+    html += arr.map(i => {
+      const c = catOf(i.cat), t = new Date(i.ts);
+      const time = `${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
+      return `<button class="row" data-id="${esc(i.id)}">
+        <span class="ic" style="background:${tint(c.color)}">${c.icon}</span>
+        <span class="main"><span class="t">${esc(i.note || i.cat)}</span><span class="s">${i.note ? esc(i.cat) + ', ' : ''}${time}</span></span>
+        <span class="amt">${fmt(i.amount)} ₫</span></button>`;
+    }).join('') + '</div>';
+  });
+  if (sorted.length > LIMIT) html += `<p class="more">Hiển thị ${LIMIT} khoản gần nhất. Xem đầy đủ trong Google Sheet.</p>`;
+  $('#txList').innerHTML = html || (cats.length ? '<div class="empty">Không có khoản chi nào.</div>' : '');
+}
+
+function drawChart(vals, r, days) {
+  const W = 340, H = 150, top = 14, bottom = 20, n = vals.length;
+  const maxV = Math.max(...vals), m = maxV > 0 ? niceMax(maxV) : 1;
+  const gap = n > 20 ? 2 : n > 10 ? 5 : 10, bw = (W - gap * (n - 1)) / n;
+  const ch = H - top - bottom, y = v => top + ch - (v / m) * ch;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Biểu đồ chi tiêu">`;
+  s += `<line class="grid" x1="0" x2="${W}" y1="${top}" y2="${top}"/><line class="grid" x1="0" x2="${W}" y1="${top + ch}" y2="${top + ch}"/>`;
+  if (maxV > 0) s += `<text x="${W}" y="${top - 4}" text-anchor="end">${short(m)}</text>`;
+  // Đường trung bình (theo ngày khi xem tuần/tháng)
+  if (period !== 'year' && maxV > 0) {
+    const avg = vals.reduce((a, v) => a + v, 0) / days;
+    s += `<line class="avg" x1="0" x2="${W}" y1="${y(avg)}" y2="${y(avg)}"/>`;
+  }
+  vals.forEach((v, i) => {
+    const x = i * (bw + gap), h = v > 0 ? Math.max(2, top + ch - y(v)) : 0;
+    if (h) s += `<rect class="bar${selBucket === i ? ' sel' : ''}" x="${x}" y="${top + ch - h}" width="${bw}" height="${h}" rx="${Math.min(3, bw / 2)}"/>`;
+    const lab = axisLabel(i);
+    if (lab) s += `<text x="${x + bw / 2}" y="${H - 5}" text-anchor="middle">${lab}</text>`;
+    s += `<rect class="hit" data-b="${i}" x="${x - gap / 2}" y="0" width="${bw + gap}" height="${H}"/>`;
+  });
+  s += '</svg>';
+  const chart = $('#chart');
+  chart.innerHTML = s;
+  chart.classList.toggle('hasSel', selBucket !== null);
+  $('#chartCap').innerHTML = selBucket !== null
+    ? `${bucketName(selBucket, r)}: <b>${fmt(vals[selBucket])} ₫</b>`
+    : (maxV > 0 ? (period === 'year' ? 'Chạm vào cột để xem từng tháng' : 'Chạm vào cột để xem từng ngày. Nét đứt là mức trung bình.') : '');
+}
+
+$('#chart').addEventListener('click', e => {
+  const h = e.target.closest('.hit'); if (!h) return;
+  const b = Number(h.dataset.b);
+  selBucket = selBucket === b ? null : b; haptic(); renderStats();
+});
+$('#seg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#seg button').forEach(x => x.classList.toggle('on', x === b));
+  period = b.dataset.p; offset = 0; selBucket = null; renderStats();
+});
+$('#prevP').addEventListener('click', () => { offset--; selBucket = null; renderStats(); });
+$('#nextP').addEventListener('click', () => { if (offset < 0) { offset++; selBucket = null; renderStats(); } });
+$('#catList').addEventListener('click', e => {
+  const g = e.target.closest('[data-goto]'); if (g) { showView(g.dataset.goto); return; }
+  const b = e.target.closest('.row'); if (!b) return;
+  catFilter = catFilter === b.dataset.cat ? null : b.dataset.cat; selBucket = null; renderStats();
+});
+$('#clearFilter').addEventListener('click', () => { catFilter = null; renderStats(); });
+$('#txList').addEventListener('click', e => {
+  const b = e.target.closest('.row'); if (!b) return;
+  const it = items.find(i => i.id === b.dataset.id); if (!it) return;
+  const d = new Date(it.ts);
+  actionSheet(`${catOf(it.cat).icon} ${fmt(it.amount)} ₫, ${it.cat}${it.note ? ' (' + it.note + ')' : ''}, ${dayLabel(d).toLowerCase()}`,
+    [{ label: 'Xóa khoản chi', danger: true, fn: () => { removeExpense(it.id); toast('Đã xóa khoản chi'); } }]);
+});
+
+/* ============================================================
+   ĐIỀU HƯỚNG, SHEET, CÀI ĐẶT
+   ============================================================ */
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === id));
+  if (id === 'vStats') renderStats();
+}
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+
+const overlay = $('#overlay');
+let openEl = null;
+function openSheet(sel) { openEl = $(sel); overlay.classList.add('show'); openEl.classList.add('show'); if (sel === '#settings') renderSettings(); }
+function closeSheet() { overlay.classList.remove('show'); if (openEl) openEl.classList.remove('show'); openEl = null; }
+overlay.addEventListener('click', closeSheet);
+$('#acancel').addEventListener('click', closeSheet);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+function actionSheet(title, actions) {
+  $('#atitle').textContent = title;
+  const box = $('#aactions'); box.innerHTML = '';
+  actions.forEach(a => {
+    const b = document.createElement('button');
+    b.className = 'aaction' + (a.danger ? ' danger' : '');
+    b.textContent = a.label;
+    b.onclick = () => { closeSheet(); a.fn(); };
+    box.appendChild(b);
+  });
+  openSheet('#asheet');
+}
+
+function renderSettings() {
+  $('#cfgUrl').value = cfg.url; $('#cfgToken').value = cfg.token;
+  let st = '';
+  if (!cfg.url) st = queue.length ? `${queue.length} khoản chi đang lưu trên máy, sẽ gửi lên khi kết nối.` : 'Chưa kết nối.';
+  else if (lastError) st = `Lỗi gần nhất: ${lastError}. Kiểm tra lại URL, mã bảo mật và quyền truy cập "Bất kỳ ai" của web app.`;
+  else st = queue.length ? `Còn ${queue.length} thao tác chờ gửi.` : `Đã đồng bộ ${items.length} khoản chi.`;
+  $('#cfgStatus').textContent = st;
+  const link = $('#sheetLink');
+  link.hidden = !sheetUrl; if (sheetUrl) link.href = sheetUrl;
+}
+$('#settingsBtn').addEventListener('click', () => openSheet('#settings'));
+$('#closeSettings').addEventListener('click', closeSheet);
+$('#cfgSave').addEventListener('click', async () => {
+  cfg = { url: $('#cfgUrl').value.trim(), token: $('#cfgToken').value.trim() };
+  LS.set('ct.cfg', cfg);
+  $('#cfgStatus').textContent = 'Đang kết nối…';
+  await sync();
+  renderSettings();
+  if (!lastError && cfg.url) { closeSheet(); toast('Đã kết nối Google Sheet'); }
+});
+
+/* ---------- Khởi động ---------- */
+renderAmount(); renderDate(); renderQuick(); updateSync(); sync();
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
