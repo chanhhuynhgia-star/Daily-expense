@@ -278,10 +278,9 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 <div class="sheet" id="settings" role="dialog" aria-label="Kết nối Google Sheet">
   <div class="sheetBar"><span></span><strong>Kết nối Google Sheet</strong><button class="textBtn" id="closeSettings">Xong</button></div>
   <div class="sheetBody">
-    <p class="foot">Dán URL web app lấy từ Google Apps Script và mã bảo mật bạn đã đặt trong file Code.gs. Khi chưa kết nối, các khoản chi vẫn được lưu trên máy này và sẽ tự gửi lên sau.</p>
+    <p class="foot">Dán URL web app lấy từ Google Apps Script. Khi chưa kết nối, các khoản chi vẫn được lưu trên máy này và sẽ tự gửi lên sau.</p>
     <div class="group">
       <label class="field"><span>URL web app</span><input id="cfgUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
-      <label class="field"><span>Mã bảo mật</span><input id="cfgToken" type="text" placeholder="Giống TOKEN trong Code.gs" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
     </div>
     <p class="foot" id="cfgStatus"></p>
     <button class="primary" id="cfgSave">Lưu và đồng bộ</button>
@@ -338,7 +337,7 @@ const LS = {
 let items = LS.get('ct.items', []);          // tất cả khoản chi (bản sao trên máy)
 let queue = LS.get('ct.queue', []);          // thao tác chờ gửi lên Sheet
 queue.forEach(o => delete o.sending);
-let cfg = LS.get('ct.cfg', { url: '', token: '' });
+let cfg = LS.get('ct.cfg', { url: '' });
 let sheetUrl = LS.get('ct.sheetUrl', '');
 let amount = '';
 let pickedDate = null;                        // null = hôm nay
@@ -506,7 +505,7 @@ async function flush() {
     while (queue.length) {
       const op = queue[0];
       op.sending = true;
-      const res = await post({ token: cfg.token, action: op.action, item: op.item, id: op.id });
+      const res = await post({ action: op.action, item: op.item, id: op.id });
       if (!res.ok) throw new Error(res.error || 'Máy chủ từ chối');
       queue = queue.filter(o => o !== op); saveQueue();
     }
@@ -523,8 +522,7 @@ async function pull() {
   if (!cfg.url || !navigator.onLine) return;
   pulling = true; updateSync();
   try {
-    const sep = cfg.url.includes('?') ? '&' : '?';
-    const r = await fetch(cfg.url + sep + 'token=' + encodeURIComponent(cfg.token));
+    const r = await fetch(cfg.url);
     const data = await r.json();
     if (!data.ok) throw new Error(data.error || 'Máy chủ từ chối');
     const pendingAdds = queue.filter(o => o.action === 'add').map(o => o.item);
@@ -755,10 +753,10 @@ function actionSheet(title, actions) {
 }
 
 function renderSettings() {
-  $('#cfgUrl').value = cfg.url; $('#cfgToken').value = cfg.token;
+  $('#cfgUrl').value = cfg.url;
   let st = '';
   if (!cfg.url) st = queue.length ? `${queue.length} khoản chi đang lưu trên máy, sẽ gửi lên khi kết nối.` : 'Chưa kết nối.';
-  else if (lastError) st = `Lỗi gần nhất: ${lastError}. Kiểm tra lại URL, mã bảo mật và quyền truy cập "Bất kỳ ai" của web app.`;
+  else if (lastError) st = `Lỗi gần nhất: ${lastError}. Kiểm tra lại URL và quyền truy cập "Bất kỳ ai" của web app.`;
   else st = queue.length ? `Còn ${queue.length} thao tác chờ gửi.` : `Đã đồng bộ ${items.length} khoản chi.`;
   $('#cfgStatus').textContent = st;
   const link = $('#sheetLink');
@@ -767,7 +765,7 @@ function renderSettings() {
 $('#settingsBtn').addEventListener('click', () => openSheet('#settings'));
 $('#closeSettings').addEventListener('click', closeSheet);
 $('#cfgSave').addEventListener('click', async () => {
-  cfg = { url: $('#cfgUrl').value.trim(), token: $('#cfgToken').value.trim() };
+  cfg = { url: $('#cfgUrl').value.trim() };
   LS.set('ct.cfg', cfg);
   $('#cfgStatus').textContent = 'Đang kết nối…';
   await sync();
