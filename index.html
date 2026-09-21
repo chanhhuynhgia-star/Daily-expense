@@ -74,7 +74,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .note::placeholder{color:var(--label2)}
 .note:focus{outline:none;background:var(--fill2)}
 
-.quick{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none;min-height:48px;align-items:center;flex:none}
+.quick{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none;min-height:48px;align-items:center;flex:none}
 .quick::-webkit-scrollbar{display:none}
 .chip{flex:none;height:34px;padding:0 14px;border:0;border-radius:17px;background:var(--card);
   font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;box-shadow:0 0 0 .5px var(--sep)}
@@ -257,9 +257,9 @@ button.setRow:active{background:var(--fill)}
       <input id="note" class="note" placeholder="Thêm ghi chú" maxlength="80" autocomplete="off" enterkeyhint="done">
     </div>
 
-    <div class="quick" id="quick"></div>
     <div class="cats" id="cats"></div>
     <div class="catDots" id="catDots"></div>
+    <div class="quick" id="quick"></div>
     <div class="padWrap"><div class="keypad" id="keypad"></div></div>
   </section>
 
