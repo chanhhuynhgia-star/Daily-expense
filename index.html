@@ -20,6 +20,7 @@
   --sep:rgba(60,60,67,.29); --fill:rgba(118,118,128,.12); --fill2:rgba(120,120,128,.2);
   --blue:#007AFF; --blueTint:rgba(0,122,255,.12); --red:#FF3B30; --green:#34C759; --orange:#FF9500;
   --bar:rgba(249,249,249,.84); --material:rgba(255,255,255,.86);
+  --keyFill:#E3E3E8; --keyActive:#BDBDC4;
 }
 @media (prefers-color-scheme: dark){
   :root{
@@ -28,6 +29,7 @@
     --sep:rgba(84,84,88,.65); --fill:rgba(118,118,128,.24); --fill2:rgba(120,120,128,.36);
     --blue:#0A84FF; --blueTint:rgba(10,132,255,.2); --red:#FF453A; --green:#30D158; --orange:#FF9F0A;
     --bar:rgba(22,22,23,.84); --material:rgba(44,44,46,.9);
+    --keyFill:#333336; --keyActive:#5A5A5E;
   }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -74,7 +76,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .note::placeholder{color:var(--label2)}
 .note:focus{outline:none;background:var(--fill2)}
 
-.quick{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none;min-height:48px;align-items:center;flex:none}
+.quick{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;min-height:48px;align-items:center;flex:none}
 .quick::-webkit-scrollbar{display:none}
 .chip{flex:none;height:34px;padding:0 14px;border:0;border-radius:17px;background:var(--card);
   font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;box-shadow:0 0 0 .5px var(--sep)}
@@ -84,26 +86,30 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 @keyframes nudge{50%{transform:scale(1.07)}}
 .hint{margin:0;width:100%;text-align:center;font-size:13px;color:var(--label2)}
 
-.cats{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;flex:none}
+/* Khối dưới: bàn phím ở chính giữa, cột danh mục cuộn dọc ở bên trái (hoặc phải) */
+#vAdd{--k:min(70px,18vw);--gx:16px;--gy:9px}
+.board{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:start;flex:none;padding-bottom:6px}
+.cats{grid-column:1;grid-row:1;justify-self:stretch;min-width:0;height:calc(var(--k) * 4 + var(--gy) * 3);
+  overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;display:flex;flex-direction:column;gap:var(--gy);overscroll-behavior:contain}
 .cats::-webkit-scrollbar{display:none}
-.catPage{flex:none;width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;scroll-snap-align:start;align-content:start}
-.cat{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 0;border-radius:14px;min-width:0}
-.cat .ic{width:52px;height:52px;border-radius:26px;display:grid;place-items:center;font-size:25px;transition:transform .12s}
-.cat:active .ic{transform:scale(.9)}
-.cat .nm{font-size:12px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
-.catDots{display:flex;justify-content:center;gap:6px;height:14px;align-items:center;flex:none}
-.catDots i{width:6px;height:6px;border-radius:3px;background:var(--label3)}
-.catDots i.on{background:var(--label)}
+.side-right .cats{grid-column:3}
+.cats.loop{--fade:linear-gradient(to bottom,transparent 0,#000 22px,#000 calc(100% - 22px),transparent 100%);
+  -webkit-mask-image:var(--fade);mask-image:var(--fade)}
+.cat{flex:none;height:var(--k);width:100%;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:0;border-radius:14px;min-width:0;scroll-snap-align:start}
+.cat .ic{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:22px;transition:transform .12s}
+.cat:active .ic{transform:scale(.88)}
+.cat .nm{font-size:11px;line-height:13px;letter-spacing:-.2px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 1px}
 
-.padWrap{border-top:.5px solid var(--sep);padding-top:6px;flex:none}
-.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;width:100%;max-width:282px;margin:0 auto}
-.hand-left .keypad{margin-left:0}
-.hand-right .keypad{margin-right:0}
-.key{height:54px;border:0;border-radius:14px;background:none;font-size:28px;font-weight:400;
-  display:grid;place-items:center;font-variant-numeric:tabular-nums;user-select:none;-webkit-user-select:none}
-.key:active{background:var(--fill2)}
-.key svg{width:28px;height:28px}
-.key.small{font-size:22px}
+/* Bàn phím kiểu app Điện thoại: phím tròn tuyệt đối, nền xám, số to */
+.keypad{grid-column:2;grid-row:1;display:grid;grid-template-columns:repeat(3,var(--k));grid-auto-rows:var(--k);column-gap:var(--gx);row-gap:var(--gy)}
+.key{width:var(--k);height:var(--k);padding:0;border:0;border-radius:50%;background:var(--keyFill);font-size:32px;font-weight:400;letter-spacing:.5px;
+  display:grid;place-items:center;font-variant-numeric:tabular-nums;user-select:none;-webkit-user-select:none;transition:background .08s}
+.key:active{background:var(--keyActive)}
+.key.small{font-size:22px;letter-spacing:0}
+.key.del{background:none}
+.key.del:active{background:var(--fill)}
+.key svg{width:30px;height:30px}
 
 /* ---------- Tab thống kê ---------- */
 #vStats{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:24px}
@@ -167,8 +173,37 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .tab.active{color:var(--blue)}
 .tab svg{width:26px;height:26px}
 
+/* Nút micro: ở khoảng trống đối diện cột danh mục, ngang hàng phím 6 (hoặc 4) */
+.mic{grid-column:3;grid-row:1;justify-self:center;margin-top:calc(var(--k) + var(--gy) + (var(--k) - 52px) / 2);
+  width:52px;height:52px;border:0;border-radius:50%;background:var(--blueTint);color:var(--blue);display:grid;place-items:center}
+.side-right .mic{grid-column:1}
+.mic svg{width:24px;height:24px}
+.mic:active{transform:scale(.94)}
+.mic.on{background:var(--red);color:#fff;animation:micPulse 1.2s infinite}
+@keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(255,59,48,.45)}100%{box-shadow:0 0 0 16px rgba(255,59,48,0)}}
+.heard{margin:0;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;color:var(--label);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.heard span:last-child{overflow:hidden;text-overflow:ellipsis}
+.heard.idle{color:var(--label2)}
+.recDot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1s infinite}
+
+/* Nút chụp hóa đơn: ngang hàng phím 9 */
+.mic.cam{margin-top:calc(2 * (var(--k) + var(--gy)) + (var(--k) - 52px) / 2)}
+.rcTop{display:flex;gap:14px;align-items:center;margin:4px 0 16px}
+.rcTop img{flex:none;width:76px;height:100px;object-fit:cover;border-radius:10px;background:var(--fill)}
+.rcTop img:not([src]){visibility:hidden}
+.rcStatus{margin:0;font-size:15px;line-height:1.4;color:var(--label2)}
+.rcStatus.busy::before{content:"";display:inline-block;width:12px;height:12px;margin-right:8px;vertical-align:-1px;border-radius:50%;
+  border:2px solid var(--label3);border-top-color:var(--blue);animation:spin .8s linear infinite}
+.rcStatus.err{color:var(--red)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rcText{margin:20px 0 8px;font-size:13px;color:var(--label2)}
+.rcText summary{cursor:pointer;padding:6px 0}
+.rcText pre{white-space:pre-wrap;font:inherit;background:var(--card);border-radius:10px;padding:12px;max-height:220px;overflow:auto;margin:6px 0 0;color:var(--label)}
+.textBtn:disabled{color:var(--label3)}
+
 /* ---------- Toast ---------- */
-.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);transform:translate(-50%,20px);opacity:0;pointer-events:none;
+.toast{max-width:calc(100vw - 24px);position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);transform:translate(-50%,20px);opacity:0;pointer-events:none;
   display:flex;align-items:center;gap:14px;padding:10px 10px 10px 18px;border-radius:24px;min-height:50px;
   background:var(--material);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   box-shadow:0 8px 30px rgba(0,0,0,.14),0 0 0 .5px var(--sep);font-size:15px;font-weight:500;
@@ -202,7 +237,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .setRow + .setRow::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep)}
 button.setRow:active{background:var(--fill)}
 .setRow .val{color:var(--label2);display:flex;align-items:center;gap:8px}
-.setRow .seg{margin:0;width:190px}
+.setRow .seg{margin:0;width:190px;flex:none}
 .dangerBtn{display:block;width:100%;height:50px;border:0;border-radius:12px;background:var(--card);color:var(--red);font-size:17px;margin-top:24px}
 .catPick{display:flex;flex-wrap:wrap;gap:8px}
 .pickChip{height:36px;padding:0 12px;border:0;border-radius:18px;background:var(--card);font-size:15px;box-shadow:0 0 0 .5px var(--sep)}
@@ -229,8 +264,9 @@ button.setRow:active{background:var(--fill)}
 
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 @media (max-height:700px){
-  .cat .ic{width:44px;height:44px;font-size:21px}
-  .key{height:46px}
+  #vAdd{--k:min(60px,16vw);--gx:14px;--gy:7px}
+  .cat .ic{width:38px;height:38px;font-size:19px}
+  .key{font-size:28px}
   .amount{font-size:52px}
 }
 </style>
@@ -257,10 +293,18 @@ button.setRow:active{background:var(--fill)}
       <input id="note" class="note" placeholder="Thêm ghi chú" maxlength="80" autocomplete="off" enterkeyhint="done">
     </div>
 
-    <div class="cats" id="cats"></div>
-    <div class="catDots" id="catDots"></div>
     <div class="quick" id="quick"></div>
-    <div class="padWrap"><div class="keypad" id="keypad"></div></div>
+    <div class="board">
+      <div class="cats" id="cats"></div>
+      <div class="keypad" id="keypad"></div>
+      <button class="mic" id="micBtn" aria-label="Nhập bằng giọng nói">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+      </button>
+      <button class="mic cam" id="camBtn" aria-label="Chụp hóa đơn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.4-2h5.8l1.4 2h2.2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5Z"/><circle cx="12" cy="13" r="3.4"/></svg>
+      </button>
+      <input type="file" id="camInput" accept="image/*" hidden>
+    </div>
   </section>
 
   <!-- ===== Tab 2: Thống kê ===== -->
@@ -305,7 +349,7 @@ button.setRow:active{background:var(--fill)}
   </nav>
 </div>
 
-<div class="toast" id="toast" role="status"><span id="toastText"></span><button id="toastUndo">Hoàn tác</button></div>
+<div class="toast" id="toast" role="status"><span id="toastText" style="overflow:hidden;text-overflow:ellipsis"></span><button id="toastUndo">Hoàn tác</button></div>
 
 <div class="overlay" id="overlay"></div>
 
@@ -323,11 +367,15 @@ button.setRow:active{background:var(--fill)}
     <p class="groupLabel">Tùy chỉnh</p>
     <div class="group">
       <button class="setRow" id="openCats"><span>Danh mục</span><span class="val"><span id="catCount"></span><svg class="chev" viewBox="0 0 8 14" width="8" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1 1 6 6-6 6"/></svg></span></button>
-      <div class="setRow"><span>Bàn phím</span>
-        <div class="seg" id="handSeg"><button data-h="left">Trái</button><button data-h="center">Giữa</button><button data-h="right">Phải</button></div>
+      <div class="setRow"><span>Sắp xếp</span>
+        <div class="seg" id="sortSeg"><button data-s="auto">Tự động</button><button data-s="manual">Cố định</button></div>
+      </div>
+      <div class="setRow"><span>Cột danh mục</span>
+        <div class="seg" id="handSeg"><button data-h="left">Bên trái</button><button data-h="right">Bên phải</button></div>
       </div>
     </div>
-    <p class="foot">Chọn Trái hoặc Phải để dồn bàn phím số về phía tay bạn cầm máy.</p>
+    <p class="foot">Tự động: danh mục bạn hay dùng nhất vào khung giờ này được đặt cạnh phím 4. Thứ tự chỉ đổi khi mở app, không đổi lúc bạn đang bấm. Cố định: giữ đúng thứ tự trong mục Danh mục.</p>
+    <p class="foot">Bàn phím luôn ở giữa. Cột danh mục bên trái thì danh mục gợi ý nhất nằm cạnh phím 4, bên phải thì nằm cạnh phím 6.</p>
   </div>
 </div>
 
@@ -338,7 +386,23 @@ button.setRow:active{background:var(--fill)}
     <p class="foot">Gõ tên, biểu tượng tự đổi theo. Chạm vào biểu tượng để chọn cái khác.</p>
     <div class="group" id="catRows"></div>
     <button class="addRow" id="catAdd">Thêm danh mục</button>
-    <p class="foot">Đổi tên một danh mục thì các khoản chi cũ cũng đổi theo. Xóa danh mục không xóa các khoản chi đã ghi.</p>
+    <p class="foot">Đổi tên một danh mục thì các khoản chi cũ cũng đổi theo. Xóa danh mục không xóa các khoản chi đã ghi. Thứ tự ở đây được dùng khi chọn sắp xếp Cố định, hoặc khi chưa đủ 10 khoản chi để app tự sắp xếp. Danh mục đầu tiên nằm cạnh phím 4, danh mục thứ hai ở ngay trên.</p>
+  </div>
+</div>
+
+<!-- Hóa đơn chụp ảnh -->
+<div class="sheet" id="rcSheet" role="dialog" aria-label="Hóa đơn">
+  <div class="sheetBar"><button class="textBtn left" data-close>Hủy</button><strong>Hóa đơn</strong><button class="textBtn" id="rcSave">Lưu</button></div>
+  <div class="sheetBody">
+    <div class="rcTop"><img id="rcImg" alt="Ảnh hóa đơn"><p class="rcStatus" id="rcStatus"></p></div>
+    <div class="group">
+      <label class="field"><span>Số tiền (₫)</span><input id="rcAmount" class="big" inputmode="numeric" autocomplete="off" placeholder="0"></label>
+      <label class="field"><span>Thời gian</span><input id="rcTime" type="datetime-local"></label>
+      <label class="field"><span>Ghi chú</span><input id="rcNote" maxlength="80" autocomplete="off" placeholder="Tên cửa hàng"></label>
+    </div>
+    <p class="groupLabel">Danh mục</p>
+    <div class="catPick" id="rcCats"></div>
+    <details class="rcText" id="rcTextWrap" hidden><summary>Chữ đọc được từ ảnh</summary><pre id="rcText"></pre></details>
   </div>
 </div>
 
@@ -353,6 +417,7 @@ button.setRow:active{background:var(--fill)}
     </div>
     <p class="groupLabel">Danh mục</p>
     <div class="catPick" id="eCats"></div>
+    <a class="linkRow" id="eReceipt" target="_blank" rel="noopener" hidden>Xem ảnh hóa đơn trên Drive</a>
     <button class="dangerBtn" id="editDelete">Xóa khoản chi</button>
   </div>
 </div>
@@ -376,30 +441,30 @@ const PALETTE = ['#FF9500', '#A2845E', '#007AFF', '#FF2D55', '#FFCC00', '#AF52DE
 
 /* Từ khóa (không dấu) → biểu tượng. Nhóm đứng trước được ưu tiên. */
 const ICON_RULES = [
-  [['tra sua'], '🧋'],
+  [['tra sua', 'gong cha', 'tocotoco', 'koi the', 'phe la', 'mixue', 'bobapop'], '🧋'],
   [['tra no', 'no', 'tra gop', 'vay', 'the tin dung', 'lai'], '💳'],
-  [['ca phe', 'cafe', 'coffee', 'cf', 'cofe'], '☕'],
+  [['ca phe', 'cafe', 'coffee', 'cf', 'cofe', 'highlands', 'starbucks', 'phuc long', 'katinat', 'cong ca phe', 'trung nguyen'], '☕'],
   [['tra', 'tra da'], '🍵'],
   [['nhau', 'bia', 'ruou'], '🍺'],
   [['em be', 'con', 'con cai', 'bim', 'sua bot', 'tre em'], '👶'],
-  [['di cho', 'cho', 'sieu thi', 'thuc pham', 'rau', 'bach hoa'], '🛒'],
-  [['an', 'an uong', 'an sang', 'an trua', 'an toi', 'an vat', 'com', 'bun', 'pho', 'do an', 'banh mi'], '🍜'],
-  [['xang', 'do xang'], '⛽'],
+  [['di cho', 'cho', 'sieu thi', 'thuc pham', 'rau', 'bach hoa', 'bach hoa xanh', 'coopmart', 'co op', 'winmart', 'vinmart', 'lotte mart', 'aeon', 'big c', 'emart', 'circle k', 'gs25', '7 eleven', 'ministop', 'familymart', 'mega market'], '🛒'],
+  [['an', 'an uong', 'an sang', 'an trua', 'an toi', 'an vat', 'com', 'bun', 'pho', 'do an', 'banh mi', 'nha hang', 'quan an', 'restaurant', 'kfc', 'lotteria', 'jollibee', 'mcdonald', 'pizza', 'lau', 'buffet', 'bbq', 'com tam'], '🍜'],
+  [['xang', 'do xang', 'petrolimex', 'xang dau', 'pvoil', 'cay xang'], '⛽'],
   [['may bay', 've may bay', 'du lich', 'khach san', 'resort'], '✈️'],
   [['gui xe', 'do xe', 've xe', 'bai xe'], '🅿️'],
   [['sua chua', 'sua xe', 'bao duong', 'sua nha'], '🔧'],
   [['grab', 'taxi', 'be', 'xanh sm', 'gojek'], '🚕'],
   [['di chuyen', 'xe', 'xe om', 'xe buyt', 'bus', 'di lai', 'giao thong'], '🛵'],
   [['quan ao', 'thoi trang', 'giay', 'dep'], '👕'],
-  [['mua sam', 'shopee', 'lazada', 'tiki', 'online', 'tiktok shop'], '🛍️'],
+  [['mua sam', 'shopee', 'lazada', 'tiki', 'online', 'tiktok shop', 'uniqlo', 'zara', 'the gioi di dong', 'dien may xanh', 'fpt shop', 'cellphones'], '🛍️'],
   [['dien thoai', 'sim', 'nap the', 'nap tien'], '📱'],
-  [['dien', 'hoa don', 'tien dien'], '💡'],
+  [['dien', 'hoa don', 'tien dien', 'evn'], '💡'],
   [['nuoc', 'tien nuoc'], '🚰'],
   [['internet', 'wifi', 'mang', 'truyen hinh'], '📶'],
   [['benh vien', 'kham', 'bac si', 'nha khoa', 'rang'], '🏥'],
-  [['suc khoe', 'thuoc', 'nha thuoc', 'y te'], '💊'],
+  [['suc khoe', 'thuoc', 'nha thuoc', 'y te', 'pharmacity', 'long chau', 'an khang'], '💊'],
   [['nha', 'thue nha', 'tien nha', 'phong tro', 'nha cua'], '🏠'],
-  [['giai tri', 'phim', 'rap', 'xem phim', 'netflix', 'spotify'], '🎬'],
+  [['giai tri', 'phim', 'rap', 'xem phim', 'netflix', 'spotify', 'cgv', 'lotte cinema', 'bhd', 'galaxy cinema'], '🎬'],
   [['game'], '🎮'],
   [['nhac', 'karaoke', 'concert'], '🎤'],
   [['gym', 'the thao', 'tap', 'yoga', 'boi', 'chay bo', 'bong da', 'cau long'], '🏋️'],
@@ -468,7 +533,9 @@ let queue = LS.get('ct.queue', []);
 queue.forEach(o => delete o.sending);
 let cats = cleanCats(LS.get('ct.cats', null) || DEFAULT_CATS);
 let cfg = LS.get('ct.cfg', { url: '' });
-let hand = LS.get('ct.hand', 'center');
+let hand = LS.get('ct.side', 'left');   // phía đặt cột danh mục
+if (hand !== 'right') hand = 'left';
+let sortMode = LS.get('ct.sort', 'auto');
 let sheetUrl = LS.get('ct.sheetUrl', '');
 let amount = '';
 let pickedDate = null;
@@ -502,10 +569,10 @@ function press(k) {
 }
 
 (function buildKeypad() {
-  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '0', 'del'];
+  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', '000'];
   const pad = $('#keypad');
   pad.innerHTML = keys.map(k => k === 'del'
-    ? `<button class="key" data-k="del" aria-label="Xóa"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M10 6h13a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10l-7-8 7-8Z"/><path d="m13 11 6 6m0-6-6 6"/></svg></button>`
+    ? `<button class="key del" data-k="del" aria-label="Xóa"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M10 6h13a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10l-7-8 7-8Z"/><path d="m13 11 6 6m0-6-6 6"/></svg></button>`
     : `<button class="key${k === '000' ? ' small' : ''}" data-k="${k}">${k}</button>`).join('');
   let holdTimer;
   pad.addEventListener('click', e => { const b = e.target.closest('.key'); if (b) press(b.dataset.k); });
@@ -516,30 +583,91 @@ function press(k) {
   ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => pad.addEventListener(ev, () => clearTimeout(holdTimer)));
 })();
 
+function applySort() {
+  document.querySelectorAll('#sortSeg button').forEach(b => b.classList.toggle('on', b.dataset.s === sortMode));
+}
+$('#sortSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  sortMode = b.dataset.s; LS.set('ct.sort', sortMode); applySort(); buildCats(); haptic();
+});
 function applyHand() {
   const v = $('#vAdd');
-  v.classList.remove('hand-left', 'hand-right');
-  if (hand !== 'center') v.classList.add('hand-' + hand);
+  v.classList.toggle('side-right', hand === 'right');
   document.querySelectorAll('#handSeg button').forEach(b => b.classList.toggle('on', b.dataset.h === hand));
 }
 $('#handSeg').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  hand = b.dataset.h; LS.set('ct.hand', hand); applyHand(); haptic();
+  hand = b.dataset.h; LS.set('ct.side', hand); applyHand(); buildCats(); haptic();
 });
 
-/* ---------- Lưới danh mục (8 ô mỗi trang, vuốt ngang nếu nhiều hơn) ---------- */
+/* ---------- Sắp xếp danh mục tự động ----------
+   Mỗi khoản chi trong 120 ngày gần nhất cộng điểm cho danh mục của nó:
+   - gần khung giờ hiện tại (±1,5 giờ) được cộng nhiều nhất,
+   - càng gần đây càng nặng ký (giảm một nửa sau khoảng 3 tuần),
+   - cùng loại ngày (ngày thường / cuối tuần) được cộng thêm 30%.
+   Danh mục điểm cao nhất nằm cạnh phím 4. */
+function catScores() {
+  const now = new Date(), h = now.getHours() + now.getMinutes() / 60;
+  const weekend = d => d.getDay() === 0 || d.getDay() === 6, wkNow = weekend(now);
+  const scores = new Map(); let count = 0;
+  items.forEach(i => {
+    const t = new Date(i.ts), age = (now - t) / 864e5;
+    if (age < 0 || age > 120) return;
+    let dh = Math.abs(t.getHours() + t.getMinutes() / 60 - h); dh = Math.min(dh, 24 - dh);
+    const wTime = 0.25 + Math.exp(-(dh * dh) / 4.5);
+    const wRecent = Math.exp(-age / 30);
+    const wDay = weekend(t) === wkNow ? 1.3 : 1;
+    scores.set(i.cat, (scores.get(i.cat) || 0) + wTime * wRecent * wDay);
+    count++;
+  });
+  return { scores, count };
+}
+function rankedCats() {
+  if (sortMode !== 'auto') return null;
+  const { scores, count } = catScores();
+  if (count < 10) return null;                       // chưa đủ dữ liệu thì giữ thứ tự tự đặt
+  return cats.map((c, idx) => ({ c, idx, sc: scores.get(c.name) || 0 }))
+    .sort((a, b) => b.sc - a.sc || a.idx - b.idx).map(x => x.c);
+}
+
+/* Cột danh mục cuộn dọc, mỗi ô ngang hàng với một hàng phím.
+   Thứ tự hiển thị: [hạng 2, hạng 1, hạng 3, hạng 4, ...]
+   để hạng 1 nằm ở hàng 4-5-6, ngay cạnh phím 4. */
+const LOOP_COPIES = 5;   // lặp danh sách 5 lần để cuộn vòng tròn, luôn đứng ở bản giữa
+let catLoopN = 0, catIdle;
 function buildCats() {
-  const pages = [];
-  for (let i = 0; i < cats.length; i += 8) pages.push(cats.slice(i, i + 8));
-  $('#cats').innerHTML = pages.map(p => `<div class="catPage">${p.map(c =>
-    `<button class="cat" data-cat="${esc(c.name)}"><span class="ic" style="background:${tint(c.color)}">${c.icon}</span><span class="nm">${esc(c.name)}</span></button>`).join('')}</div>`).join('');
-  $('#catDots').innerHTML = pages.length > 1 ? pages.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('') : '';
-  $('#cats').scrollLeft = 0;
+  const list = rankedCats() || cats;
+  const shown = list.length > 1 ? [list[1], list[0], ...list.slice(2)] : list;
+  const el = $('#cats');
+  const loop = shown.length > 4;
+  catLoopN = loop ? shown.length : 0;
+  const copies = loop ? LOOP_COPIES : 1, mid = Math.floor(copies / 2);
+  let html = '';
+  for (let k = 0; k < copies; k++) {
+    const hidden = k !== mid ? ' tabindex="-1" aria-hidden="true"' : '';
+    html += shown.map(c =>
+      `<button class="cat" data-cat="${esc(c.name)}"${hidden}><span class="ic" style="background:${tint(c.color)}">${c.icon}</span><span class="nm">${esc(c.name)}</span></button>`).join('');
+  }
+  el.innerHTML = html;
+  el.classList.toggle('loop', loop);
+  recenterCats(true);
   $('#catCount').textContent = cats.length;
 }
+// Đưa cột về bản sao ở giữa mà không đổi hình ảnh đang thấy
+function recenterCats(reset) {
+  const el = $('#cats');
+  if (!catLoopN || !el.children.length) { if (reset) el.scrollTop = 0; return; }
+  const copyH = el.children[catLoopN].offsetTop - el.children[0].offsetTop;
+  if (!copyH) return;                                   // đang ẩn (tab khác), để lần sau
+  const mid = Math.floor(LOOP_COPIES / 2) * copyH;
+  if (reset) { el.scrollTop = mid; return; }
+  const off = ((el.scrollTop - mid) % copyH + copyH) % copyH;
+  const pos = off > copyH / 2 ? mid - (copyH - off) : mid + off;
+  if (Math.abs(pos - el.scrollTop) > 1) el.scrollTop = pos;
+}
 $('#cats').addEventListener('scroll', () => {
-  const el = $('#cats'), i = Math.round(el.scrollLeft / el.clientWidth);
-  document.querySelectorAll('#catDots i').forEach((d, k) => d.classList.toggle('on', k === i));
+  clearTimeout(catIdle);
+  catIdle = setTimeout(() => recenterCats(false), 180);   // chỉ nhảy khi đã dừng cuộn
 }, { passive: true });
 
 let longPressed = false, lpTimer;
@@ -606,24 +734,17 @@ function shakeAmount() {
   amountEl.classList.remove('shake'); void amountEl.offsetWidth; amountEl.classList.add('shake');
   try { navigator.vibrate && navigator.vibrate([10, 40, 10]); } catch (e) {}
 }
-function addExpense(cat, amt, note) {
-  if (!amt) { shakeAmount(); return; }
-  if (amt < 1000) {           // gõ "25" mà chưa chọn đơn vị
-    shakeAmount();
-    const q = $('#quick'); q.classList.remove('nudge'); void q.offsetWidth; q.classList.add('nudge');
-    return;
-  }
+// Tạo và lưu một khoản chi (dùng chung cho bàn phím và giọng nói)
+function createExpense(cat, amt, note, day, opts = {}) {
   const now = new Date();
-  const d = pickedDate ? new Date(pickedDate) : now;
-  if (pickedDate) d.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
-  const item = { id: uid(), ts: d.toISOString(), amount: amt, cat, note: note || '' };
+  const base = day || pickedDate;
+  let d = base ? new Date(base) : now;
+  if (base) d.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+  if (opts.at) d = new Date(opts.at);
+  const item = { id: uid(), ts: d.toISOString(), amount: amt, cat, note: note || '', receipt: opts.receipt || '' };
   items.push(item); saveItems();
   queue.push({ action: 'add', item: { ...item } }); saveQueue();
-  amount = ''; noteEl.value = ''; noteEl.blur();
-  renderAmount(); haptic();
-  const extra = pickedDate ? ` (${dayLabel(d).toLowerCase()})` : '';
-  toast(`Đã lưu ${catOf(cat).icon} ${fmt(amt)} ₫${extra}`, () => removeExpense(item.id));
-  flush();
+  return item;
 }
 
 function updateExpense(id, changes) {
@@ -638,14 +759,238 @@ function updateExpense(id, changes) {
   saveQueue(); renderAssist(); renderStats(); flush();
 }
 
+const fileIdFromUrl = u => { const m = String(u || '').match(/\/d\/([-\w]{20,})/) || String(u || '').match(/[?&]id=([-\w]{20,})/); return m ? m[1] : ''; };
 function removeExpense(id) {
+  const it = items.find(i => i.id === id);
   items = items.filter(i => i.id !== id); saveItems();
   queue = queue.filter(o => !(o.action === 'update' && o.item.id === id && !o.sending));
   const addIdx = queue.findIndex(o => o.action === 'add' && o.item.id === id);
-  if (addIdx >= 0 && !queue[addIdx].sending) queue.splice(addIdx, 1);
-  else queue.push({ action: 'delete', id });
+  if (addIdx >= 0 && !queue[addIdx].sending) {
+    queue.splice(addIdx, 1);                                   // chưa gửi thì bỏ luôn
+    const fid = it && fileIdFromUrl(it.receipt);
+    if (fid) queue.push({ action: 'deleteFile', fileId: fid }); // và bỏ ảnh hóa đơn trên Drive
+  } else queue.push({ action: 'delete', id });                 // máy chủ tự bỏ ảnh đi kèm
   saveQueue();
   renderAssist(); renderStats(); flush();
+}
+function addExpense(cat, amt, note) {
+  if (!amt) { shakeAmount(); return; }
+  if (amt < 1000) {           // gõ "25" mà chưa chọn đơn vị
+    shakeAmount();
+    const q = $('#quick'); q.classList.remove('nudge'); void q.offsetWidth; q.classList.add('nudge');
+    return;
+  }
+  const item = createExpense(cat, amt, note);
+  const wasPast = !!pickedDate;
+  amount = ''; noteEl.value = ''; noteEl.blur();
+  renderAmount(); haptic();
+  const extra = wasPast ? ` (${dayLabel(new Date(item.ts)).toLowerCase()})` : '';
+  toast(`Đã lưu ${catOf(cat).icon} ${fmt(amt)} ₫${extra}`, () => removeExpense(item.id));
+  flush();
+}
+
+/* ============================================================
+   NHẬP BẰNG GIỌNG NÓI
+   Ví dụ: "cà phê 25 nghìn", "ăn trưa bún bò bốn mươi lăm k",
+   "đổ xăng một trăm nghìn hôm qua", "grab 1 triệu 2",
+   "cà phê 25k và ăn trưa 45k" (nhiều khoản một lần).
+   ============================================================ */
+// Khi không có danh mục đúng biểu tượng, thử danh mục gần nghĩa (theo thứ tự)
+const ICON_FALLBACK = {
+  '⛽': ['🛵'], '🚕': ['🛵'], '🅿️': ['🛵'], '✈️': ['🛵', '🎬'], '🔧': ['🛵'],
+  '🧋': ['☕', '🍜'], '🍵': ['☕', '🍜'], '🍺': ['🍜', '🎬'], '☕': ['🍜'], '🛒': ['🍜'],
+  '🏥': ['💊'], '🏋️': ['💊', '🎬'],
+  '🚰': ['💡'], '📶': ['💡'], '📱': ['💡'], '🏠': ['💡'], '🛡️': ['💡'],
+  '🎮': ['🎬'], '🎤': ['🎬'],
+  '👕': ['🛍️'], '💄': ['🛍️'], '💇': ['🛍️'], '🎁': ['🛍️'],
+};
+function catFromIcon(ic) {
+  if (!ic) return null;
+  for (const want of [ic, ...(ICON_FALLBACK[ic] || [])]) {
+    const c = cats.find(c => c.icon === want) || cats.find(c => autoIcon(c.name) === want);
+    if (c) return c.name;
+  }
+  return null;
+}
+const NUM_WORDS = { khong: 0, mot: 1, hai: 2, ba: 3, bon: 4, tu: 4, nam: 5, lam: 5, nham: 5, sau: 6, bay: 7, tam: 8, chin: 9 };
+const NUM_UNITS = { nghin: 1e3, ngan: 1e3, k: 1e3, trieu: 1e6, tr: 1e6, cu: 1e6, ty: 1e9, ti: 1e9 };
+const NUM_TENS = new Set(['muoi', 'chuc']);
+const NUM_FILL = new Set(['le', 'linh', 'dong', 'd', 'vnd']);
+const ptok = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase().replace(/[^a-z0-9.]/g, '');
+const isDigitTok = p => /^\d+(\.\d+)?$/.test(p);
+const isWordNum = p => p in NUM_WORDS || NUM_TENS.has(p) || p === 'tram';
+const isNumTok = p => isDigitTok(p) || isWordNum(p) || p in NUM_UNITS || NUM_FILL.has(p) || p === 'ruoi';
+
+function runValue(ps) {
+  let total = 0, hund = 0, small = 0, lastUnit = 0, prev = '';
+  for (const p of ps) {
+    if (isDigitTok(p)) small += parseFloat(p);
+    else if (p in NUM_WORDS) {
+      const d = NUM_WORDS[p];
+      if (NUM_TENS.has(prev)) small += d;                       // hai mươi lăm
+      else if (prev in NUM_WORDS && small < 10) small = small * 10 + d;   // "hai lăm" = 25
+      else small = d;
+    }
+    else if (NUM_TENS.has(p)) small = small ? small * 10 : 10;
+    else if (p === 'tram') { hund += (small || 1) * 100; small = 0; }
+    else if (p in NUM_UNITS) { total += (hund + small || 1) * NUM_UNITS[p]; hund = small = 0; lastUnit = NUM_UNITS[p]; }
+    else if (p === 'ruoi') {
+      if (prev === 'tram') hund += 50;
+      else if (prev in NUM_UNITS) total += lastUnit / 2;
+    }
+    if (!NUM_FILL.has(p)) prev = p;
+  }
+  const rem = hund + small;
+  if (rem > 0) {
+    if (lastUnit >= 1000) total += rem < 10 ? rem * lastUnit / 10 : rem < 100 ? rem * lastUnit / 100 : rem * lastUnit / 1000;  // "1 triệu 2"
+    else total += rem;
+  }
+  if (!lastUnit && total > 0 && total < 1000) total *= 1000;    // "cà phê 25" hiểu là 25.000
+  return Math.round(total);
+}
+
+function parseSpoken(text) {
+  let t = ' ' + text.toLowerCase() + ' ';
+  t = t.replace(/(\d{1,3}(?:[.,]\d{3})+)(?!\d)/g, m => m.replace(/[.,]/g, ''));   // 25.000 → 25000
+  t = t.replace(/(\d),(\d)/g, '$1.$2');                                            // 1,5 → 1.5
+  t = t.replace(/(\d)\s*(k|tr|đ|d)(?=[\s.,]|$)/g, '$1 $2');                         // 25k → 25 k
+  const toks = t.split(/\s+/).filter(Boolean), ps = toks.map(ptok);
+
+  // Tìm cụm số tiền
+  let best = null;
+  for (let i = 0; i < ps.length; i++) {
+    const p = ps[i];
+    const canStart = isDigitTok(p) || (isWordNum(p) && i + 1 < ps.length && (isWordNum(ps[i + 1]) || ps[i + 1] in NUM_UNITS || ps[i + 1] === 'ruoi'));
+    if (!canStart) continue;
+    let j = i + 1;
+    while (j < ps.length && isNumTok(ps[j]) && !(isWordNum(ps[j]) && isDigitTok(ps[j - 1]) && !(ps[j - 1] in NUM_UNITS) && !(ps[j + 1] in NUM_UNITS))) j++;
+    const run = ps.slice(i, j);
+    const strong = run.some(x => isDigitTok(x) || x in NUM_UNITS || NUM_TENS.has(x) || x === 'tram');
+    if (strong) {
+      const hasUnit = run.some(x => x in NUM_UNITS);
+      if (!best || (hasUnit && !best.hasUnit)) best = { i, j, hasUnit };
+    }
+    i = j - 1;
+  }
+  const used = new Set();
+  let amt = 0;
+  if (best) { amt = runValue(ps.slice(best.i, best.j)); for (let k = best.i; k < best.j; k++) used.add(k); }
+
+  // Ngày
+  let day = null;
+  for (let i = 0; i + 1 < ps.length; i++) {
+    const pair = ps[i] + ' ' + ps[i + 1];
+    let back = null;
+    if (['hom qua', 'toi qua', 'dem qua', 'trua qua', 'sang qua'].includes(pair)) back = 1;
+    if (pair === 'hom kia') back = 2;
+    if (back !== null) { day = sod(new Date()); day.setDate(day.getDate() - back); used.add(i); used.add(i + 1); }
+    if (pair === 'hom nay' || pair === 'sang nay' || pair === 'trua nay' || pair === 'toi nay') { used.add(i); used.add(i + 1); }
+  }
+
+  // Phần chữ còn lại: bỏ từ đệm ở hai đầu
+  const FILLER = new Set(['het', 'mat', 'la', 'chi', 'khoan', 'dong', 'voi', 'thi', 'ghi', 'them', 'nhe', 'a']);
+  let rest = toks.map((w, k) => used.has(k) ? null : { w: w.replace(/[.,!?]/g, ''), p: ps[k] }).filter(x => x && x.p);
+  while (rest.length && FILLER.has(rest[0].p)) rest.shift();
+  while (rest.length && FILLER.has(rest[rest.length - 1].p)) rest.pop();
+  const restPlain = ' ' + rest.map(x => x.p).join(' ') + ' ';
+
+  // Danh mục: khớp tên trước, sau đó khớp theo từ khóa (cùng biểu tượng)
+  let cat = null, matchedName = null;
+  cats.forEach(c => {
+    const n = plain(c.name);
+    if (n && restPlain.includes(' ' + n + ' ') && (!matchedName || n.length > matchedName.length)) { cat = c.name; matchedName = n; }
+  });
+  if (!cat && rest.length) {
+    cat = catFromIcon(autoIcon(rest.map(x => x.w).join(' ')));
+  }
+
+  // Ghi chú: phần chữ còn lại, bỏ tên danh mục nếu đã nói đúng tên
+  let words = rest;
+  if (matchedName) {
+    const nw = matchedName.split(' ');
+    for (let k = 0; k + nw.length <= words.length; k++) {
+      if (words.slice(k, k + nw.length).map(x => x.p).join(' ') === matchedName) { words = words.slice(0, k).concat(words.slice(k + nw.length)); break; }
+    }
+  }
+  let note = words.map(x => x.w).join(' ').trim();
+  if (['tien', 'tien la'].includes(plain(note))) note = '';
+  if (note) note = note[0].toUpperCase() + note.slice(1);
+  return { amount: amt, cat, note, day, text: text.trim() };
+}
+
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recog = null, listening = false;
+function showHeard(text, live) {
+  $('#quick').innerHTML = `<p class="heard${live ? '' : ' idle'}">${live ? '<span class="recDot"></span>' : ''}<span>${esc(text)}</span></p>`;
+}
+function startVoice() {
+  if (listening) { recog.stop(); return; }
+  if (!SpeechRec) {
+    toast('Trình duyệt này chưa hỗ trợ giọng nói. Hãy thử Safari hoặc Chrome.');
+    return;
+  }
+  let finalText = '', lastInterim = '', errMsg = '';
+  recog = new SpeechRec();
+  recog.lang = 'vi-VN'; recog.interimResults = true; recog.continuous = false; recog.maxAlternatives = 1;
+  recog.onstart = () => { listening = true; $('#micBtn').classList.add('on'); haptic(); showHeard('Đang nghe… ví dụ "cà phê 25 nghìn"', true); };
+  recog.onresult = e => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const tr = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalText += tr + ' '; else interim += tr;
+    }
+    lastInterim = interim;
+    const shown = (finalText + interim).trim();
+    if (shown) showHeard(shown, true);
+  };
+  recog.onerror = e => {
+    errMsg = (e.error === 'not-allowed' || e.error === 'service-not-allowed') ? 'Chưa có quyền dùng micro. Cho phép micro trong cài đặt trình duyệt.'
+      : e.error === 'no-speech' ? 'Không nghe thấy gì, chạm micro để thử lại'
+      : e.error === 'aborted' ? '' : 'Không nhận được giọng nói, thử lại nhé';
+  };
+  recog.onend = () => {
+    listening = false; $('#micBtn').classList.remove('on');
+    const text = (finalText || lastInterim).trim();
+    if (text) handleVoice(text);
+    else { renderAssist(); if (errMsg) toast(errMsg); }
+  };
+  try { recog.start(); } catch (e) { listening = false; toast('Không bật được micro, thử lại nhé'); }
+}
+$('#micBtn').addEventListener('click', startVoice);
+
+function handleVoice(text) {
+  const segs = text.split(/\s+(?:và|với|rồi|thêm|xong)\s+|;|,\s+(?=\D)/i).map(x => x.trim()).filter(Boolean);
+  const parsed = segs.map(parseSpoken);
+  const done = parsed.filter(p => p.amount >= 1000 && p.cat);
+  const todo = parsed.filter(p => !(p.amount >= 1000 && p.cat));
+  const saved = done.map(p => createExpense(p.cat, p.amount, p.note, p.day));
+
+  if (todo.length) {
+    // Điền phần nghe được lên màn hình, bạn chạm danh mục hoặc gõ thêm số
+    const p = todo.find(x => x.amount) || todo[0];
+    amount = p.amount ? String(p.amount) : '';
+    noteEl.value = p.note || '';
+    if (p.day) pickedDate = p.day;
+    renderDate(); renderAmount();
+    if (!p.amount) shakeAmount();
+  } else {
+    renderAmount();
+  }
+
+  if (saved.length) {
+    haptic();
+    const undo = () => saved.forEach(it => removeExpense(it.id));
+    if (saved.length === 1) {
+      const it = saved[0], past = sod(new Date(it.ts)).getTime() !== sod(new Date()).getTime();
+      toast(`🎙 Đã lưu ${catOf(it.cat).icon} ${fmt(it.amount)} ₫${it.note ? ', ' + it.note : ''}${past ? ` (${dayLabel(new Date(it.ts)).toLowerCase()})` : ''}`, undo);
+    } else {
+      toast(`🎙 Đã lưu ${saved.length} khoản, ${fmt(saved.reduce((a, i) => a + i.amount, 0))} ₫`, undo);
+    }
+    flush();
+  } else if (todo.length) {
+    const p = todo[0];
+    toast(p.amount ? `🎙 "${p.text}". Chạm danh mục để lưu` : `🎙 "${p.text}". Chưa nghe ra số tiền`);
+  }
 }
 
 /* ---------- Toast ---------- */
@@ -750,7 +1095,7 @@ async function sync() { await flush(); await pull(); }
 $('#syncBtn').addEventListener('click', () => { if (!cfg.url) openSheet('#settings'); else sync(); });
 window.addEventListener('online', sync);
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') { renderDate(); sync(); }
+  if (document.visibilityState === 'visible') { renderDate(); buildCats(); sync(); }
 });
 
 /* ============================================================
@@ -857,7 +1202,7 @@ function renderStats() {
       const c = catOf(i.cat), t = new Date(i.ts);
       return `<button class="row" data-id="${esc(i.id)}">
         <span class="ic" style="background:${tint(c.color)}">${c.icon}</span>
-        <span class="main"><span class="t">${esc(i.note || i.cat)}</span><span class="s">${i.note ? esc(i.cat) + ', ' : ''}${pad2(t.getHours())}:${pad2(t.getMinutes())}</span></span>
+        <span class="main"><span class="t">${esc(i.note || i.cat)}</span><span class="s">${i.note ? esc(i.cat) + ', ' : ''}${pad2(t.getHours())}:${pad2(t.getMinutes())}${i.receipt ? ' 🧾' : ''}</span></span>
         <span class="amt">${fmt(i.amount)} ₫</span>
         <svg class="chev" viewBox="0 0 8 14" width="8" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1 1 6 6-6 6"/></svg></button>`;
     }).join('') + '</div>';
@@ -917,6 +1262,166 @@ $('#txList').addEventListener('click', e => {
 });
 
 /* ============================================================
+   CHỤP HÓA ĐƠN: ảnh lưu lên Google Drive, Google đọc chữ (OCR),
+   app tìm tổng tiền, ngày, tên cửa hàng rồi cho bạn kiểm tra lại.
+   ============================================================ */
+let rc = null;
+const camInput = $('#camInput');
+$('#camBtn').addEventListener('click', () => {
+  if (!cfg.url) { toast('Kết nối Google Sheet trong Cài đặt để dùng chụp hóa đơn'); openSheet('#settings'); return; }
+  if (!navigator.onLine) { toast('Cần có mạng để lưu và đọc hóa đơn'); return; }
+  camInput.value = ''; camInput.click();
+});
+camInput.addEventListener('change', () => { const f = camInput.files && camInput.files[0]; if (f) openReceipt(f); });
+
+async function shrinkImage(file, max = 1600, q = 0.82) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image(); img.src = url; await img.decode();
+    const scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', q);
+  } finally { URL.revokeObjectURL(url); }
+}
+function setRcStatus(text, busy, err) {
+  const el = $('#rcStatus'); el.textContent = text;
+  el.classList.toggle('busy', !!busy); el.classList.toggle('err', !!err);
+}
+function renderRcCats() {
+  const sel = rc && rc.cat;
+  $('#rcCats').innerHTML = cats.map(c => `<button class="pickChip${c.name === sel ? ' on' : ''}" data-cat="${esc(c.name)}">${c.icon} ${esc(c.name)}</button>`).join('');
+}
+$('#rcCats').addEventListener('click', e => {
+  const b = e.target.closest('.pickChip'); if (!b || !rc) return;
+  rc.cat = b.dataset.cat; rc.catTouched = true; haptic(); renderRcCats();
+});
+
+async function openReceipt(file) {
+  const token = uid();
+  rc = { token, fileId: null, url: null, cat: null, catTouched: false };
+  $('#rcImg').removeAttribute('src');
+  $('#rcAmount').value = ''; $('#rcNote').value = ''; $('#rcTime').value = localInput(new Date());
+  $('#rcText').textContent = ''; $('#rcTextWrap').hidden = true;
+  $('#rcSave').disabled = true;
+  setRcStatus('Đang xử lý ảnh…', true);
+  renderRcCats(); openSheet('#rcSheet');
+  try {
+    const dataUrl = await shrinkImage(file);
+    if (!rc || rc.token !== token) return;
+    $('#rcImg').src = dataUrl;
+    setRcStatus('Đang lưu ảnh lên Drive và đọc nội dung, mất vài giây…', true);
+    const res = await post({ action: 'receipt', image: dataUrl.split(',')[1], mime: 'image/jpeg' });
+    if (!rc || rc.token !== token) {                     // đã bấm Hủy trong lúc chờ
+      if (res && res.fileId) post({ action: 'deleteFile', fileId: res.fileId }).catch(() => {});
+      return;
+    }
+    if (!res.ok) throw new Error(res.error || 'Máy chủ từ chối');
+    rc.fileId = res.fileId; rc.url = res.url;
+    if (res.text && res.text.trim()) {
+      const r = parseReceipt(res.text);
+      if (r.amount && !$('#rcAmount').value) $('#rcAmount').value = fmt(r.amount);
+      if (r.merchant && !$('#rcNote').value) $('#rcNote').value = r.merchant;
+      if (r.date) $('#rcTime').value = localInput(r.date);
+      if (r.cat && !rc.catTouched) { rc.cat = r.cat; renderRcCats(); }
+      $('#rcText').textContent = res.text; $('#rcTextWrap').hidden = false;
+      setRcStatus(r.amount ? 'Đã đọc xong. Kiểm tra lại rồi bấm Lưu.' : 'Đã lưu ảnh nhưng chưa thấy tổng tiền. Nhập giúp số tiền nhé.', false);
+    } else if (res.ocrError) {
+      setRcStatus(`Đã lưu ảnh lên Drive nhưng chưa đọc được chữ: ${res.ocrError}. Nhập tay giúp nhé.`, false, true);
+    } else {
+      setRcStatus('Đã lưu ảnh lên Drive. Không đọc được chữ trong ảnh, nhập tay giúp nhé.', false);
+    }
+  } catch (e) {
+    if (!rc || rc.token !== token) return;
+    setRcStatus(`Không tải được ảnh lên (${e.message || e}). Bạn vẫn lưu được khoản chi, chỉ là không kèm ảnh.`, false, true);
+  } finally {
+    if (rc && rc.token === token) $('#rcSave').disabled = false;
+  }
+}
+function discardReceipt() {
+  if (rc && rc.fileId) post({ action: 'deleteFile', fileId: rc.fileId }).catch(() => {});
+  rc = null;
+}
+$('#rcSave').addEventListener('click', () => {
+  if (!rc) return;
+  const amt = Number($('#rcAmount').value.replace(/\D/g, ''));
+  if (!amt) { $('#rcAmount').focus(); toast('Nhập giúp số tiền'); return; }
+  if (!rc.cat) { toast('Chọn giúp một danh mục'); return; }
+  const tv = $('#rcTime').value, t = tv ? new Date(tv) : new Date();
+  const item = createExpense(rc.cat, amt, $('#rcNote').value.trim(), null, { at: isNaN(t) ? new Date() : t, receipt: rc.url || '' });
+  rc = null; closeSheet();
+  renderAmount(); haptic();
+  toast(`🧾 Đã lưu ${catOf(item.cat).icon} ${fmt(amt)} ₫`, () => removeExpense(item.id));
+  flush();
+});
+
+/* Tìm tổng tiền, ngày, tên cửa hàng trong chữ đọc được */
+function parseReceipt(text) {
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const P = lines.map(l => ' ' + plain(l) + ' ');
+  const EXCLUDE = [' khach dua ', ' tien khach ', ' tien thua ', ' tra lai ', ' tien mat ', ' change ', ' cash ', ' giam gia ', ' chiet khau ', ' vat ', ' thue ', ' so du ', ' phi '];
+  const money = l => {
+    const out = [];
+    const re = /\d{1,3}(?:[.,]\d{3})+(?!\d)|\d{4,}/g; let m;
+    while ((m = re.exec(l))) {
+      const raw = m[0], plainDigits = !/[.,]/.test(raw);
+      if (plainDigits && (raw.length >= 9 || (raw[0] === '0' && raw.length >= 8))) continue;   // mã số, số điện thoại
+      const v = parseInt(raw.replace(/[.,]/g, ''), 10);
+      if (v >= 1000 && v <= 5e8) out.push(v);
+    }
+    return out;
+  };
+  let amount = 0;
+  const KEYS = ['tong thanh toan', 'khach can tra', 'khach phai tra', 'can thanh toan', 'phai thanh toan', 'so tien thanh toan', 'tong cong', 'tong tien', 'so tien', 'thanh toan', 'grand total', 'total', 'tong', 'amount'];
+  for (const k of KEYS) {
+    for (let i = lines.length - 1; i >= 0 && !amount; i--) {
+      if (!P[i].includes(' ' + k + ' ') || EXCLUDE.some(x => P[i].includes(x))) continue;
+      const nums = money(lines[i]).concat(money(lines[i + 1] || ''));
+      if (nums.length) amount = money(lines[i]).length ? money(lines[i]).pop() : nums[0];
+    }
+    if (amount) break;
+  }
+  if (!amount) {
+    const all = lines.filter((l, i) => !EXCLUDE.some(x => P[i].includes(x))).flatMap(money);
+    if (all.length) amount = Math.max(...all);
+  }
+
+  let date = null;
+  const dm = text.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/) || text.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+  if (dm) {
+    let [, d, mo, y] = dm.map(Number);
+    if (y < 100) y += 2000;
+    if (d >= 1 && d <= 31 && mo >= 1 && mo <= 12 && y >= 2000) {
+      const tm = text.match(/\b(\d{1,2})[:h](\d{2})\b/);
+      const cand = new Date(y, mo - 1, d, tm ? Math.min(23, +tm[1]) : 12, tm ? Math.min(59, +tm[2]) : 0);
+      const ageDays = (Date.now() - cand) / 864e5;
+      if (ageDays > -1 && ageDays < 400) date = cand;
+    }
+  }
+
+  const SKIP = /\b(hoa don|phieu|bill|receipt|ma so thue|mst|dia chi|dc|dt|tel|hotline|ngay|so hd|thu ngan|ban so|quay|www|http|invoice|lien|mau so|ky hieu)\b/;
+  let merchant = '';
+  for (let i = 0; i < Math.min(lines.length, 8); i++) {
+    const l = lines[i], pl = plain(l);
+    if ((l.match(/\p{L}/gu) || []).length < 3 || SKIP.test(pl) || /^\d/.test(l)) continue;
+    merchant = l.replace(/\s+/g, ' ').slice(0, 40); break;
+  }
+  // Ảnh chụp chuyển khoản ngân hàng: ghi "Chuyển khoản cho <người nhận>"
+  const recv = lines.findIndex((l, i) => /\b(nguoi nhan|ten nguoi nhan|den tai khoan|ten tai khoan nhan)\b/.test(P[i]));
+  if (recv >= 0) {
+    const after = lines[recv].replace(/^.*?(nhận|khoản)\s*:?\s*/i, '').trim();
+    const who = (after && /\p{L}{2}/u.test(after) ? after : (lines[recv + 1] || '')).slice(0, 30);
+    merchant = who ? 'Chuyển khoản cho ' + who.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase()) : 'Chuyển khoản';
+  }
+  if (merchant && merchant === merchant.toUpperCase()) merchant = merchant.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
+
+  // Chuyển khoản thì để bạn tự chọn danh mục; hóa đơn cửa hàng thì đoán theo tên và vài dòng đầu
+  const cat = recv >= 0 ? null : catFromIcon(autoIcon(merchant + ' ' + lines.slice(0, 10).join(' ')));
+  return { amount, date, merchant, cat };
+}
+
+/* ============================================================
    SỬA KHOẢN CHI
    ============================================================ */
 let editId = null, editCat = null;
@@ -926,6 +1431,7 @@ function openEdit(id) {
   $('#eAmount').value = fmt(it.amount);
   $('#eTime').value = localInput(new Date(it.ts));
   $('#eNote').value = it.note || '';
+  const rl = $('#eReceipt'); rl.hidden = !it.receipt; if (it.receipt) rl.href = it.receipt;
   renderEditCats();
   openSheet('#editSheet');
 }
@@ -938,10 +1444,10 @@ $('#eCats').addEventListener('click', e => {
   const b = e.target.closest('.pickChip'); if (!b) return;
   editCat = b.dataset.cat; haptic(); renderEditCats();
 });
-$('#eAmount').addEventListener('input', e => {
+['#eAmount', '#rcAmount'].forEach(sel => $(sel).addEventListener('input', e => {
   const digits = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 11);
   e.target.value = digits ? fmt(Number(digits)) : '';
-});
+}));
 $('#editSave').addEventListener('click', () => {
   const amt = Number($('#eAmount').value.replace(/\D/g, ''));
   if (!amt) { $('#eAmount').focus(); return; }
@@ -1047,8 +1553,10 @@ $('#catSave').addEventListener('click', () => {
    ĐIỀU HƯỚNG, SHEET, CÀI ĐẶT
    ============================================================ */
 function showView(id) {
+  const wasHidden = !$('#' + id).classList.contains('active');
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === id));
+  if (id === 'vAdd' && wasHidden) recenterCats(true);
   renderStats();
 }
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
@@ -1062,6 +1570,7 @@ function openSheet(sel) {
   if (sel === '#settings') renderSettings();
 }
 function closeSheet() {
+  if (openEl && openEl.id === 'rcSheet') discardReceipt();
   if (document.activeElement) document.activeElement.blur();
   overlay.classList.remove('show'); if (openEl) openEl.classList.remove('show'); openEl = null;
 }
@@ -1092,7 +1601,7 @@ $('#cfgSave').addEventListener('click', async () => {
 });
 
 /* ---------- Khởi động ---------- */
-buildCats(); applyHand(); renderAmount(); renderDate(); updateSync(); sync();
+applySort(); applyHand(); buildCats(); renderAmount(); renderDate(); updateSync(); sync();
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
