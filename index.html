@@ -157,6 +157,47 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .row .chev{color:var(--label3);width:8px;flex:none}
 .meter{height:4px;border-radius:2px;background:var(--fill);margin-top:6px;overflow:hidden}
 .meter i{height:100%;border-radius:2px}
+/* ---------- Ngân sách ---------- */
+.bstrip{flex:none;width:100%;border:0;background:var(--card);border-radius:12px;padding:8px 12px 9px;margin:2px 0 4px;text-align:left;
+  display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:baseline;box-shadow:0 0 0 .5px var(--sep)}
+.bstrip[hidden]{display:none}
+.bstrip:active{background:var(--fill)}
+.bstrip .bl{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bstrip .br{font-size:12px;color:var(--label2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bmeter{display:block;grid-column:1/-1;position:relative;height:5px;border-radius:3px;background:var(--fill);overflow:hidden}
+.bmeter i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--green);transition:width .3s}
+.bmeter i.ghost{background:var(--label3);opacity:.7}
+.bmeter b{position:absolute;top:-1px;bottom:-1px;width:2px;margin-left:-1px;background:var(--label2);border-radius:1px}
+.warn .bmeter i:not(.ghost),.bmeter.warn i:not(.ghost){background:var(--orange)}
+.over .bmeter i:not(.ghost),.bmeter.over i:not(.ghost){background:var(--red)}
+.bstrip.warn .bl{color:var(--orange)} .bstrip.over .bl{color:var(--red)}
+.bstrip.flash{animation:bflash .5s 2}
+@keyframes bflash{50%{background:var(--blueTint)}}
+.bstrip.flash.warn{animation-name:bflashW} @keyframes bflashW{50%{background:rgba(255,149,0,.18)}}
+.bstrip.flash.over{animation-name:bflashR} @keyframes bflashR{50%{background:rgba(255,59,48,.16)}}
+.budget{padding:14px 16px 12px}
+.budget .head{display:flex;justify-content:space-between;align-items:baseline}
+.budget .head strong{font-size:15px;font-weight:600;color:var(--label2)}
+.budget .big{font-size:28px;font-weight:700;letter-spacing:-.3px;font-variant-numeric:tabular-nums;margin-top:4px}
+.budget .big.over{color:var(--red)} .budget .big.warn{color:var(--orange)}
+.budget .sub{font-size:14px;color:var(--label2);font-variant-numeric:tabular-nums;margin-top:2px;line-height:1.4}
+.budget .sub b{color:var(--label);font-weight:600}
+.budget .bmeter{margin:10px 0 8px;height:8px;border-radius:4px}
+.budget .bmeter i{border-radius:4px}
+.budget .legend{font-size:12px;color:var(--label2);display:flex;gap:12px;margin-bottom:2px}
+.budget .legend i{display:inline-block;width:8px;height:8px;border-radius:2px;vertical-align:-1px;margin-right:4px;background:var(--green)}
+.budget .legend i.pace{background:var(--label2);width:2px;border-radius:1px;height:10px;vertical-align:-2px}
+.brows .row .amt{font-size:15px}
+.brows .row .amt .s{margin-top:1px}
+.bRow{display:flex;align-items:center;gap:10px;padding:8px 12px 8px 12px;position:relative}
+.bRow + .bRow::before{content:"";position:absolute;top:0;left:58px;right:0;border-top:.5px solid var(--sep)}
+.bRow .ic{flex:none;width:36px;height:36px;border-radius:18px;font-size:19px;display:grid;place-items:center}
+.bRow .nm{flex:1;min-width:0;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bRow .nm small{display:block;font-size:12px;color:var(--label2);font-variant-numeric:tabular-nums}
+.bRow input{width:120px;flex:none;border:0;border-radius:8px;background:var(--fill);font:inherit;font-size:17px;font-variant-numeric:tabular-nums;color:var(--label);padding:6px 10px;text-align:right}
+.bRow input:focus{outline:none;background:var(--fill2)}
+.bRow input::placeholder{color:var(--label3)}
+
 .row .s b{color:var(--label);font-weight:600}
 .row .s .up,.row .s .down{font-weight:600}
 
@@ -330,6 +371,10 @@ button.setRow:active{background:var(--fill)}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
       </button>
     </header>
+    <button class="bstrip" id="bstrip" hidden aria-label="Ngân sách tháng">
+      <span class="bl" id="bLeft"></span><span class="br" id="bRight"></span>
+      <span class="bmeter"><i class="ghost" id="bGhost"></i><i id="bFill"></i><b id="bPace"></b></span>
+    </button>
 
     <div class="amountWrap">
       <div class="amount zero" id="amount" aria-live="polite"><span id="amountNum">0</span><span class="cur">₫</span></div>
@@ -371,6 +416,7 @@ button.setRow:active{background:var(--fill)}
         <div class="chartCap" id="chartCap"></div>
         <div id="chart"></div>
       </div>
+      <div class="card budget" id="budgetCard" style="margin-top:8px" hidden></div>
 
       <div id="deep" hidden>
         <div class="sectionHead"><h2>Nhận xét</h2></div>
@@ -464,10 +510,11 @@ button.setRow:active{background:var(--fill)}
     <p class="foot" id="cfgStatus"></p>
     <button class="primary" id="cfgSave">Lưu và đồng bộ</button>
     <a class="linkRow" id="sheetLink" target="_blank" rel="noopener" hidden>Mở Google Sheet</a>
-    <p class="foot" style="text-align:center">Phiên bản 12</p>
+    <p class="foot" style="text-align:center">Phiên bản 13</p>
 
     <p class="groupLabel">Tùy chỉnh</p>
     <div class="group">
+      <button class="setRow" id="openBudget"><span>Ngân sách tháng</span><span class="val"><span id="budgetVal"></span><svg class="chev" viewBox="0 0 8 14" width="8" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1 1 6 6-6 6"/></svg></span></button>
       <button class="setRow" id="openCats"><span>Danh mục</span><span class="val"><span id="catCount"></span><svg class="chev" viewBox="0 0 8 14" width="8" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1 1 6 6-6 6"/></svg></span></button>
       <div class="setRow"><span>Sắp xếp</span>
         <div class="seg" id="sortSeg"><button data-s="auto">Tự động</button><button data-s="manual">Cố định</button></div>
@@ -505,6 +552,22 @@ button.setRow:active{background:var(--fill)}
     <p class="groupLabel">Danh mục</p>
     <div class="catPick" id="rcCats"></div>
     <details class="rcText" id="rcTextWrap" hidden><summary>Chữ đọc được từ ảnh</summary><pre id="rcText"></pre></details>
+  </div>
+</div>
+
+<!-- Ngân sách -->
+<div class="sheet" id="budgetSheet" role="dialog" aria-label="Ngân sách">
+  <div class="sheetBar"><button class="textBtn left" data-close>Hủy</button><strong>Ngân sách</strong><button class="textBtn" id="budgetSave">Lưu</button></div>
+  <div class="sheetBody">
+    <div class="group">
+      <label class="field"><span>Ngân sách cả tháng (₫)</span><input id="bTotal" class="big" inputmode="numeric" autocomplete="off" placeholder="0"></label>
+    </div>
+    <p class="foot" id="bTotalHint"></p>
+    <p class="groupLabel">Giới hạn theo danh mục (không bắt buộc)</p>
+    <div class="group" id="bCatRows"></div>
+    <button class="addRow" id="bSuggest">Gợi ý theo 3 tháng gần nhất</button>
+    <p class="foot">Để trống tổng thì app lấy tổng các danh mục. Bạn sẽ thấy còn lại bao nhiêu ngay ở tab Ghi chi, được nhắc khi một danh mục chạm 80% và khi vượt. Ngân sách được lưu trên máy này.</p>
+    <button class="dangerBtn" id="bClear">Bỏ ngân sách</button>
   </div>
 </div>
 
@@ -659,7 +722,7 @@ function renderAmount() {
   amountEl.classList.toggle('zero', n === 0);
   const len = text.length;
   amountEl.style.fontSize = len <= 7 ? '' : len <= 10 ? '48px' : '38px';
-  renderAssist();
+  renderAssist(); renderBudgetStrip();
 }
 
 function press(k) {
@@ -846,6 +909,7 @@ function createExpense(cat, amt, note, day, opts = {}) {
   const item = { id: uid(), ts: d.toISOString(), amount: amt, cat, note: note || '', receipt: opts.receipt || '' };
   items.push(item); saveItems();
   queue.push({ action: 'add', item: { ...item } }); saveQueue();
+  budgetCheck(item);
   return item;
 }
 
@@ -1330,7 +1394,7 @@ const slotRange = s => `${s.from}h–${s.to > 24 ? s.to - 24 : s.to}h`;
 const SIZES = [[0, 20e3, 'Dưới 20k'], [20e3, 50e3, '20k – 50k'], [50e3, 100e3, '50k – 100k'], [100e3, 500e3, '100k – 500k'], [500e3, Infinity, 'Trên 500k']];
 
 /* Đổi renderStats thành hàm gọi cả hai tab (mỗi tab tự bỏ qua nếu đang ẩn) */
-function renderStats() { renderStatsView(); renderList(); }
+function renderStats() { renderBudgetStrip(); renderStatsView(); renderList(); }
 
 function renderStatsView() {
   if (!$('#vStats').classList.contains('active')) return;
@@ -1360,6 +1424,7 @@ function renderStatsView() {
   list.forEach(i => { const b = bucketOf(new Date(i.ts), r); if (b >= 0 && b < r.n) vals[b] += i.amount; });
   if (selBucket !== null && selBucket >= r.n) selBucket = null;
   drawChart(vals, r, days);
+  renderBudgetCard();
 
   /* ----- Theo danh mục: số khoản, trung bình mỗi khoản, so với kỳ trước ----- */
   const byCat = new Map(), prevByCat = new Map();
@@ -2047,6 +2112,7 @@ $('#catSave').addEventListener('click', () => {
     items.forEach(i => { if (i.cat === d.orig) i.cat = d.name; });
     queue.forEach(o => { if ((o.action === 'add' || o.action === 'update') && !o.sending && o.item.cat === d.orig) o.item.cat = d.name; });
     queue.push({ action: 'renameCat', from: d.orig, to: d.name });
+    if (budget.cats[d.orig] !== undefined) { budget.cats[d.name] = budget.cats[d.orig]; delete budget.cats[d.orig]; saveBudget(); }
   });
   cats = list.map(({ name, icon, color }) => ({ name, icon, color }));
   queue = queue.filter(o => !(o.action === 'setCats' && !o.sending));
@@ -2055,6 +2121,186 @@ $('#catSave').addEventListener('click', () => {
   buildCats(); renderAssist(); renderStats(); renderSettings();
   closeSheet(); toast('Đã lưu danh mục'); flush();
 });
+
+/* ============================================================
+   NGÂN SÁCH THÁNG: mức chi cả tháng và theo danh mục, lưu trên máy.
+   Hiện còn lại ở tab Ghi chi, theo dõi nhịp chi ở Thống kê,
+   nhắc khi chạm 80% và khi vượt.
+   ============================================================ */
+let budget = LS.get('ct.budget', null);
+if (!budget || typeof budget !== 'object') budget = { total: 0, cats: {} };
+budget.total = Number(budget.total) || 0; budget.cats = budget.cats && typeof budget.cats === 'object' ? budget.cats : {};
+const saveBudget = () => LS.set('ct.budget', budget);
+const catBudgets = () => Object.entries(budget.cats).filter(([, v]) => Number(v) > 0);
+const budgetTotal = () => budget.total > 0 ? budget.total : catBudgets().reduce((a, [, v]) => a + Number(v), 0);
+const hasBudget = () => budgetTotal() > 0;
+const levelOf = (ratio, pace, current) => ratio >= 1 ? 'over' : (ratio >= .8 || (current && ratio > .3 && ratio > pace + .15)) ? 'warn' : 'ok';
+
+// Tình hình ngân sách của một tháng. extra: số tiền sắp thêm (để xem "sau khoản này còn").
+function budgetStatus(off = 0, extra = 0, extraCat = null, onlyCat = null) {
+  const r = range('month', off), now = new Date(), current = off === 0;
+  const inM = items.filter(i => inRange(i, r.s, r.e));
+  const daysAll = r.n;
+  const elapsed = current ? Math.min(daysAll, Math.round((sod(now) - r.s) / 864e5) + 1) : daysAll;
+  const remain = current ? daysAll - elapsed + 1 : 0;      // kể cả hôm nay
+  const pace = elapsed / daysAll;
+  const mk = (total, spent) => {
+    const left = total - spent, ratio = total ? spent / total : 0;
+    return { total, spent, left, ratio, level: levelOf(ratio, pace, current),
+      perDay: remain > 0 ? Math.max(0, left) / remain : 0,
+      proj: current && elapsed > 0 ? spent / elapsed * daysAll : spent };
+  };
+  if (onlyCat) {
+    const t = Number(budget.cats[onlyCat]) || 0;
+    return { ...mk(t, sum(inM.filter(i => i.cat === onlyCat)) + (extraCat === onlyCat ? extra : 0)), daysAll, elapsed, remain, pace, current, cats: [] };
+  }
+  const total = mk(budgetTotal(), sum(inM) + extra);
+  const catsSt = catBudgets().map(([name, b]) => ({ name, ...mk(Number(b), sum(inM.filter(i => i.cat === name)) + (extraCat === name ? extra : 0)) }));
+  return { ...total, daysAll, elapsed, remain, pace, current, cats: catsSt };
+}
+
+/* ---------- Dải ngân sách ở tab Ghi chi ---------- */
+let flashTimer = null, flashing = false;
+function renderBudgetStrip() {
+  const el = $('#bstrip');
+  if (!hasBudget()) { el.hidden = true; return; }
+  el.hidden = false;
+  if (flashing) return;
+  const typed = Number(amount || 0), extra = typed >= 1000 ? typed : 0;
+  const s = budgetStatus(0, extra);
+  const base = budgetStatus(0);
+  const lvl = extra ? s.level : base.level;
+  el.className = 'bstrip ' + lvl;
+  const pre = extra ? 'Sau khoản này còn ' : 'Tháng này còn ';
+  $('#bLeft').textContent = s.left >= 0 ? `${pre}${fmt(s.left)} ₫` : `${extra ? 'Sau khoản này vượt' : 'Đã vượt'} ${fmt(-s.left)} ₫`;
+  $('#bRight').textContent = s.left > 0 && s.remain > 0 ? `≈ ${short(s.perDay)}/ngày · ${s.remain} ngày` : `${Math.round(s.ratio * 100)}% ngân sách`;
+  $('#bFill').style.width = Math.min(100, base.ratio * 100).toFixed(1) + '%';
+  $('#bGhost').style.width = Math.min(100, s.ratio * 100).toFixed(1) + '%';
+  $('#bPace').style.left = (s.pace * 100).toFixed(1) + '%';
+}
+function budgetFlash(text, level) {
+  const el = $('#bstrip'); if (el.hidden) return;
+  flashing = true; clearTimeout(flashTimer);
+  el.className = 'bstrip ' + level; void el.offsetWidth; el.classList.add('flash');
+  $('#bLeft').textContent = text; $('#bRight').textContent = '';
+  haptic();
+  flashTimer = setTimeout(() => { flashing = false; el.classList.remove('flash'); renderBudgetStrip(); }, 4500);
+}
+// Sau khi lưu một khoản: nếu vừa chạm 80% hoặc vừa vượt thì nhắc
+function budgetCheck(item) {
+  if (!hasBudget()) return;
+  const r = range('month', 0); if (!inRange(item, r.s, r.e)) return;
+  const after = budgetStatus(0), before = budgetStatus(0, -item.amount, item.cat);
+  const crossed = (a, b) => (b.ratio < 1 && a.ratio >= 1) ? 'over' : (b.ratio < .8 && a.ratio >= .8) ? 'warn' : null;
+  const ac = after.cats.find(c => c.name === item.cat), bc = before.cats.find(c => c.name === item.cat);
+  const cCross = ac && bc ? crossed(ac, bc) : null, tCross = crossed(after, before);
+  if (cCross === 'over') return budgetFlash(`${item.cat} vượt ngân sách ${fmt(-ac.left)} ₫`, 'over');
+  if (tCross === 'over') return budgetFlash(`Vượt ngân sách tháng ${fmt(-after.left)} ₫`, 'over');
+  if (cCross === 'warn') return budgetFlash(`${item.cat} đã dùng ${Math.round(ac.ratio * 100)}%, còn ${fmt(ac.left)} ₫`, 'warn');
+  if (tCross === 'warn') return budgetFlash(`Đã dùng ${Math.round(after.ratio * 100)}% ngân sách tháng`, 'warn');
+}
+$('#bstrip').addEventListener('click', () => { period = 'month'; offset = 0; catFilter = null; selBucket = null; document.querySelectorAll('#seg button').forEach(x => x.classList.toggle('on', x.dataset.p === 'month')); showView('vStats'); });
+
+/* ---------- Thẻ ngân sách ở tab Thống kê (kỳ tháng) ---------- */
+function renderBudgetCard() {
+  const card = $('#budgetCard');
+  if (period !== 'month') { card.hidden = true; return; }
+  if (catFilter && !(Number(budget.cats[catFilter]) > 0)) { card.hidden = true; return; }
+  card.hidden = false;
+  if (!hasBudget()) {
+    card.innerHTML = `<div class="head"><strong>Ngân sách tháng</strong></div>
+      <p class="sub" style="margin-top:6px">Đặt mức chi cho cả tháng và từng danh mục để biết còn bao nhiêu, đang nhanh hay chậm so với nhịp đều, và được nhắc khi sắp vượt.</p>
+      <button class="inlineBtn" data-act="editBudget" style="margin-top:12px">Đặt ngân sách</button>`;
+    return;
+  }
+  const s = budgetStatus(offset, 0, null, catFilter);
+  const pct = Math.round(s.ratio * 100);
+  const title = catFilter ? `Ngân sách ${catFilter}` : 'Ngân sách tháng';
+  let big, sub, verdict;
+  if (s.current) {
+    big = s.left >= 0 ? `Còn ${fmt(s.left)} ₫` : `Vượt ${fmt(-s.left)} ₫`;
+    sub = `Đã chi <b>${fmt(s.spent)} ₫</b> / ${fmt(s.total)} ₫ (${pct}%). Đã qua ${Math.round(s.pace * 100)}% tháng.`;
+    if (s.left > 0) verdict = `Còn ${s.remain} ngày, dùng được khoảng <b>${fmt(s.perDay)} ₫/ngày</b>. `;
+    else verdict = `Đã hết ngân sách khi còn ${s.remain} ngày. `;
+    if (s.elapsed >= 3) {
+      const d = s.proj - s.total;
+      verdict += d > 0 ? `Theo nhịp hiện tại, hết tháng sẽ vượt khoảng <b>${fmt(d)} ₫</b>.` : `Theo nhịp hiện tại, hết tháng sẽ dư khoảng <b>${fmt(-d)} ₫</b>.`;
+    }
+  } else {
+    big = s.left >= 0 ? `Dư ${fmt(s.left)} ₫` : `Vượt ${fmt(-s.left)} ₫`;
+    sub = `Đã chi <b>${fmt(s.spent)} ₫</b> / ${fmt(s.total)} ₫ (${pct}%) theo ngân sách hiện tại.`;
+    verdict = '';
+  }
+  let html = `<div class="head"><strong>${esc(title)}</strong><button class="textBtn" data-act="editBudget">Sửa</button></div>
+    <div class="big ${s.level}">${big}</div><div class="sub">${sub}</div>
+    <div class="bmeter ${s.level}"><i style="width:${Math.min(100, s.ratio * 100).toFixed(1)}%"></i>${s.current ? `<b style="left:${(s.pace * 100).toFixed(1)}%"></b>` : ''}</div>
+    ${s.current ? '<div class="legend"><span><i></i>Đã chi</span><span><i class="pace"></i>Nếu chi đều mỗi ngày</span></div>' : ''}
+    ${verdict ? `<div class="sub">${verdict}</div>` : ''}`;
+  if (!catFilter && s.cats.length) {
+    html += `<div class="brows" style="margin:10px -16px -12px">` + s.cats.sort((a, b) => b.ratio - a.ratio).map(c => {
+      const cc = catOf(c.name);
+      return `<button class="row" data-cat="${esc(c.name)}"><span class="ic" style="background:${tint(cc.color)}">${cc.icon}</span>
+        <span class="main"><span class="t">${esc(c.name)}</span><span class="s">${fmt(c.spent)} / ${fmt(c.total)} ₫ · ${Math.round(c.ratio * 100)}%</span>
+          <span class="bmeter ${c.level}" style="margin:6px 0 0;height:4px;border-radius:2px"><i style="width:${Math.min(100, c.ratio * 100).toFixed(1)}%"></i></span></span>
+        <span class="amt ${c.left < 0 ? 'up' : ''}">${c.left >= 0 ? 'còn ' + fmt(c.left) : 'vượt ' + fmt(-c.left)}<span class="s">₫</span></span></button>`;
+    }).join('') + '</div>';
+  }
+  card.innerHTML = html;
+}
+$('#budgetCard').addEventListener('click', e => {
+  if (e.target.closest('[data-act="editBudget"]')) { openBudgetSheet(); return; }
+  const b = e.target.closest('.row[data-cat]'); if (!b) return;
+  catFilter = catFilter === b.dataset.cat ? null : b.dataset.cat; selBucket = null; renderStats();
+});
+
+/* ---------- Bảng đặt ngân sách ---------- */
+// Trung bình 3 tháng đầy đủ gần nhất (chỉ tính các tháng có ghi chi)
+function avgRecent(catName) {
+  let tot = 0, n = 0;
+  for (let k = 1; k <= 3; k++) {
+    const r = range('month', -k), inM = items.filter(i => inRange(i, r.s, r.e));
+    if (!inM.length) continue;
+    tot += sum(catName ? inM.filter(i => i.cat === catName) : inM); n++;
+  }
+  return n ? tot / n : 0;
+}
+const roundUp = v => v >= 1e6 ? Math.ceil(v / 1e5) * 1e5 : Math.ceil(v / 1e4) * 1e4;
+function openBudgetSheet() {
+  $('#bTotal').value = budget.total > 0 ? fmt(budget.total) : '';
+  const a = avgRecent(null);
+  $('#bTotalHint').textContent = a > 0 ? `Trung bình 3 tháng gần nhất bạn chi ${fmt(a)} ₫/tháng.` : 'Chưa có dữ liệu tháng trước để gợi ý.';
+  const names = cats.map(c => c.name);
+  Object.keys(budget.cats).forEach(n => { if (!names.includes(n) && Number(budget.cats[n]) > 0) names.push(n); });
+  $('#bCatRows').innerHTML = names.map(n => {
+    const c = catOf(n), v = Number(budget.cats[n]) || 0, av = avgRecent(n);
+    return `<div class="bRow"><span class="ic" style="background:${tint(c.color)}">${c.icon}</span>
+      <span class="nm">${esc(n)}${av > 0 ? `<small>TB ${fmt(av)} ₫</small>` : ''}</span>
+      <input inputmode="numeric" autocomplete="off" data-cat="${esc(n)}" data-avg="${Math.round(av)}" placeholder="Không giới hạn" value="${v ? fmt(v) : ''}"></div>`;
+  }).join('');
+  openSheet('#budgetSheet');
+}
+const parseAmt = v => Number(String(v).replace(/\D/g, '')) || 0;
+$('#bTotal').addEventListener('input', e => { const d = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 11); e.target.value = d ? fmt(Number(d)) : ''; });
+$('#bCatRows').addEventListener('input', e => { if (e.target.tagName !== 'INPUT') return; const d = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 11); e.target.value = d ? fmt(Number(d)) : ''; });
+$('#bSuggest').addEventListener('click', () => {
+  const a = avgRecent(null);
+  if (!a) { toast('Cần có khoản chi ở tháng trước để gợi ý'); return; }
+  $('#bTotal').value = fmt(roundUp(a));
+  document.querySelectorAll('#bCatRows input').forEach(inp => { const av = Number(inp.dataset.avg); inp.value = av > 0 ? fmt(roundUp(av)) : ''; });
+  haptic();
+});
+$('#budgetSave').addEventListener('click', () => {
+  const nb = { total: parseAmt($('#bTotal').value), cats: {} };
+  document.querySelectorAll('#bCatRows input').forEach(inp => { const v = parseAmt(inp.value); if (v > 0) nb.cats[inp.dataset.cat] = v; });
+  if (!nb.total && !Object.keys(nb.cats).length) { toast('Nhập mức chi cả tháng hoặc ít nhất một danh mục'); return; }
+  budget = nb; saveBudget();
+  closeSheet(); toast('Đã lưu ngân sách'); renderStats(); renderSettings();
+});
+$('#bClear').addEventListener('click', () => {
+  budget = { total: 0, cats: {} }; saveBudget();
+  closeSheet(); toast('Đã bỏ ngân sách'); renderStats(); renderSettings();
+});
+$('#openBudget').addEventListener('click', openBudgetSheet);
 
 /* ============================================================
    ĐIỀU HƯỚNG, SHEET, CÀI ĐẶT
@@ -2095,6 +2341,7 @@ function renderSettings() {
   const link = $('#sheetLink');
   link.hidden = !sheetUrl; if (sheetUrl) link.href = sheetUrl;
   $('#catCount').textContent = cats.length;
+  $('#budgetVal').textContent = hasBudget() ? fmt(budgetTotal()) + ' ₫' : 'Chưa đặt';
 }
 $('#settingsBtn').addEventListener('click', () => openSheet('#settings'));
 $('#openCats').addEventListener('click', openCatEditor);
@@ -2108,7 +2355,7 @@ $('#cfgSave').addEventListener('click', async () => {
 });
 
 /* ---------- Khởi động ---------- */
-applySort(); applyHand(); buildCats(); renderAmount(); renderDate(); updateSync(); sync();
+applySort(); applyHand(); buildCats(); renderAmount(); renderDate(); renderBudgetStrip(); updateSync(); sync();
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   const hadController = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.register('sw.js').then(reg => {
