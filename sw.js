@@ -1,6 +1,6 @@
 // Lưu sẵn giao diện để app mở được cả khi mất mạng.
 // Khi sửa index.html, tăng số phiên bản để máy người dùng lấy bản mới.
-const CACHE = 'chitieu-v1';
+const CACHE = 'chitieu-v2';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

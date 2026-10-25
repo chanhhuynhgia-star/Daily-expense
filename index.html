@@ -13,14 +13,26 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>Chi tiêu</title>
+<meta name="description" content="Ghi chi tiêu hằng ngày bằng bàn phím số, giọng nói hoặc ảnh hóa đơn, xem thống kê và ngân sách tháng.">
 <style>
+/* Hallmark · checked: 2026-10-25 · genre: modern-minimal (inferred) · shape: app screen
+ * floor: 1 FAIL open (76: #rcImg is filled by the camera at runtime) · fixed: 10a, 11, 12, 26a, 34, 39a, 40, 41, 48, 49, F3, F23 · structural: 0 printed
+ * surface: absolute (dark mode is OLED true black)
+ * built: the project · redesign: polish · v2.0.0 */
+/* Hallmark · waive 7b · dark --bg is #000 on body and sheets · true black on the OLED iPhones this PWA is pinned to, matching the theme-color meta and the iOS dark base */
 :root{
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,sans-serif;
   --bg:#F2F2F7; --card:#FFFFFF; --label:#000000;
   --label2:rgba(60,60,67,.6); --label3:rgba(60,60,67,.3);
   --sep:rgba(60,60,67,.29); --fill:rgba(118,118,128,.12); --fill2:rgba(120,120,128,.2);
-  --blue:#007AFF; --blueTint:rgba(0,122,255,.12); --red:#FF3B30; --green:#34C759; --orange:#FF9500;
-  --bar:rgba(249,249,249,.84); --material:rgba(255,255,255,.86);
-  --keyFill:#E3E3E8; --keyActive:#BDBDC4;
+  --blue:#0066D6; --blueTint:rgba(0,102,214,.12); --red:#D70015; --green:#34C759; --orange:#FF9500;
+  --accentFill:#0066D6; --dangerFill:#D70015; --onAccent:#FFFFFF; --onAccentDim:rgba(255,255,255,.75);
+  --orangeTint:rgba(255,149,0,.16); --orangeFlash:rgba(255,149,0,.18); --redFlash:rgba(215,0,21,.14); --redGlow:rgba(215,0,21,.45); --redGlow0:rgba(215,0,21,0);
+  --tabIdle:#6E6E73; --segOn:var(--card); --scrim:rgba(0,0,0,.35); --maskInk:#000;
+  --shadowSeg:0 3px 8px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04); --shadowPop:0 8px 30px rgba(0,0,0,.14);
+  --bar:#F9F9F9; --material:rgba(255,255,255,.86);
+  --keyFill:#E3E3E8; --keyActive:#BDBDC4; --keyHover:#D6D6DC;
+  --ease-out:cubic-bezier(.16,1,.3,1);
 }
 @media (prefers-color-scheme: dark){
   :root{
@@ -28,19 +40,25 @@
     --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3);
     --sep:rgba(84,84,88,.65); --fill:rgba(118,118,128,.24); --fill2:rgba(120,120,128,.36);
     --blue:#0A84FF; --blueTint:rgba(10,132,255,.2); --red:#FF453A; --green:#30D158; --orange:#FF9F0A;
-    --bar:rgba(22,22,23,.84); --material:rgba(44,44,46,.9);
-    --keyFill:#333336; --keyActive:#5A5A5E;
+    --accentFill:#0071E3; --dangerFill:#E0281E;
+    --orangeTint:rgba(255,159,10,.18); --orangeFlash:rgba(255,159,10,.2); --redFlash:rgba(255,69,58,.18); --redGlow:rgba(255,69,58,.45); --redGlow0:rgba(255,69,58,0);
+    --tabIdle:#8E8E93; --segOn:#636366;
+    --bar:#161617; --material:rgba(44,44,46,.9);
+    --keyFill:#333336; --keyActive:#5A5A5E; --keyHover:#434347;
   }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0}
+html,body{height:100%;margin:0;overflow-x:clip}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,sans-serif;
+  font-family:var(--font);
   background:var(--bg);color:var(--label);-webkit-font-smoothing:antialiased;
   overscroll-behavior:none;touch-action:manipulation;
 }
 button{font-family:inherit;color:inherit;cursor:pointer}
-button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button:focus-visible,input:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.pill:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+.field:has(input:focus-visible),.catRow:has(input:focus-visible){box-shadow:inset 0 0 0 2px var(--blue)}
+button:disabled{cursor:not-allowed}
 .app{height:100%;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
 .view{flex:1;min-height:0;display:none}
 .view.active{display:flex;flex-direction:column}
@@ -53,7 +71,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
   height:32px;padding:0 12px;border:0;border-radius:16px;
   background:var(--fill);font-size:15px;font-weight:600;
 }
-.pill.past{background:rgba(255,149,0,.16);color:var(--orange)}
+.pill.past{background:var(--orangeTint);color:var(--orange)}
 .pill svg{width:12px;height:12px}
 .pill input{position:absolute;inset:0;opacity:0;width:100%;height:100%;border:0;cursor:pointer}
 .sync{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:0;background:none;
@@ -74,7 +92,8 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .note{width:100%;max-width:300px;height:36px;border:0;border-radius:10px;background:var(--fill);
   padding:0 12px;font:inherit;font-size:16px;text-align:center;color:var(--label)}
 .note::placeholder{color:var(--label2)}
-.note:focus{outline:none;background:var(--fill2)}
+.note:focus{background:var(--fill2)}
+.note:focus-visible{outline-offset:0}
 
 .quick{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;min-height:48px;align-items:center;flex:none}
 .quick::-webkit-scrollbar{display:none}
@@ -93,7 +112,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
   overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;display:flex;flex-direction:column;gap:var(--gy);overscroll-behavior:contain}
 .cats::-webkit-scrollbar{display:none}
 .side-right .cats{grid-column:3}
-.cats.loop{--fade:linear-gradient(to bottom,transparent 0,#000 22px,#000 calc(100% - 22px),transparent 100%);
+.cats.loop{--fade:linear-gradient(to bottom,transparent 0,var(--maskInk) 22px,var(--maskInk) calc(100% - 22px),transparent 100%);
   -webkit-mask-image:var(--fade);mask-image:var(--fade)}
 .cat{flex:none;height:var(--k);width:100%;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:3px;padding:0;border-radius:14px;min-width:0;scroll-snap-align:start}
@@ -114,17 +133,16 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 /* ---------- Tab thống kê ---------- */
 #vStats{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:24px}
 .statsInner{max-width:620px;width:100%;margin:0 auto}
-.largeTitle{font-size:34px;font-weight:700;letter-spacing:.37px;margin:14px 16px 12px}
+.largeTitle{font-size:34px;font-weight:700;letter-spacing:.37px;margin:14px 16px 12px;text-wrap:balance}
 .seg{display:flex;margin:0 16px 16px;padding:2px;border-radius:9px;background:var(--fill)}
 .seg button{flex:1;height:30px;border:0;border-radius:7px;background:none;font-size:13px;font-weight:500}
-.seg button.on{background:var(--card);font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04)}
-@media (prefers-color-scheme: dark){.seg button.on{background:#636366}}
-.card{background:var(--card);border-radius:12px;margin:0 16px}
+.seg button.on{background:var(--segOn);font-weight:600;box-shadow:var(--shadowSeg)}
+.card{background:var(--card);color:var(--label);border-radius:12px;margin:0 16px}
 .summary{padding:14px 16px 12px}
 .periodNav{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .periodNav strong{font-size:15px;font-weight:600;color:var(--label2)}
 .navBtn{width:32px;height:32px;border:0;border-radius:16px;background:var(--fill);display:grid;place-items:center;color:var(--blue)}
-.navBtn:disabled{color:var(--label3)}
+.navBtn:disabled{color:var(--label3);background:var(--fill)}
 .navBtn svg{width:14px;height:14px}
 .sumTotal{font-size:40px;font-weight:700;letter-spacing:-.3px;font-variant-numeric:tabular-nums;margin-top:6px}
 .sumTotal small{font-size:20px;font-weight:600;color:var(--label2);margin-left:4px}
@@ -141,7 +159,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 #chart .hit{fill:transparent;cursor:pointer}
 
 .sectionHead{display:flex;align-items:baseline;justify-content:space-between;margin:26px 16px 8px}
-.sectionHead h2{font-size:22px;font-weight:700;margin:0;letter-spacing:.35px}
+.sectionHead h2{font-size:22px;font-weight:700;margin:0;letter-spacing:.35px;text-wrap:balance}
 .textBtn{border:0;background:none;color:var(--blue);font-size:15px;padding:4px 0}
 .row{display:flex;align-items:center;gap:12px;padding:10px 16px;width:100%;border:0;background:none;text-align:left;position:relative}
 .row + .row::before{content:"";position:absolute;top:0;left:60px;right:0;border-top:.5px solid var(--sep)}
@@ -165,7 +183,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .bstrip .bl{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bstrip .br{font-size:12px;color:var(--label2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .bmeter{display:block;grid-column:1/-1;position:relative;height:5px;border-radius:3px;background:var(--fill);overflow:hidden}
-.bmeter i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--green);transition:width .3s}
+.bmeter i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--green)}
 .bmeter i.ghost{background:var(--label3);opacity:.7}
 .bmeter b{position:absolute;top:-1px;bottom:-1px;width:2px;margin-left:-1px;background:var(--label2);border-radius:1px}
 .warn .bmeter i:not(.ghost),.bmeter.warn i:not(.ghost){background:var(--orange)}
@@ -173,8 +191,8 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .bstrip.warn .bl{color:var(--orange)} .bstrip.over .bl{color:var(--red)}
 .bstrip.flash{animation:bflash .5s 2}
 @keyframes bflash{50%{background:var(--blueTint)}}
-.bstrip.flash.warn{animation-name:bflashW} @keyframes bflashW{50%{background:rgba(255,149,0,.18)}}
-.bstrip.flash.over{animation-name:bflashR} @keyframes bflashR{50%{background:rgba(255,59,48,.16)}}
+.bstrip.flash.warn{animation-name:bflashW} @keyframes bflashW{50%{background:var(--orangeFlash)}}
+.bstrip.flash.over{animation-name:bflashR} @keyframes bflashR{50%{background:var(--redFlash)}}
 .budget{padding:14px 16px 12px}
 .budget .head{display:flex;justify-content:space-between;align-items:baseline}
 .budget .head strong{font-size:15px;font-weight:600;color:var(--label2)}
@@ -195,7 +213,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .bRow .nm{flex:1;min-width:0;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bRow .nm small{display:block;font-size:12px;color:var(--label2);font-variant-numeric:tabular-nums}
 .bRow input{width:120px;flex:none;border:0;border-radius:8px;background:var(--fill);font:inherit;font-size:17px;font-variant-numeric:tabular-nums;color:var(--label);padding:6px 10px;text-align:right}
-.bRow input:focus{outline:none;background:var(--fill2)}
+.bRow input:focus{background:var(--fill2)}
 .bRow input::placeholder{color:var(--label3)}
 
 .row .s b{color:var(--label);font-weight:600}
@@ -208,7 +226,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .kpi .l{font-size:12px;color:var(--label2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .insight{display:flex;gap:12px;padding:12px 16px;position:relative;align-items:flex-start}
 .insight + .insight::before{content:"";position:absolute;top:0;left:60px;right:0;border-top:.5px solid var(--sep)}
-.insight .ic{flex:none;width:32px;height:32px;border-radius:16px;display:grid;place-items:center;font-size:17px;background:var(--fill)}
+.insight .ic{flex:none;width:32px;height:32px;border-radius:16px;display:grid;place-items:center;font-size:17px;background:var(--fill);color:var(--label2)}
 .insight .t{font-size:15px;font-weight:600;line-height:1.3}
 .insight .s{font-size:14px;color:var(--label2);line-height:1.35;margin-top:2px}
 .insight .s b{color:var(--label);font-weight:600;font-variant-numeric:tabular-nums}
@@ -228,7 +246,8 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .search{margin:0 16px 12px;position:relative}
 .search input{width:100%;height:36px;border:0;border-radius:10px;background:var(--fill);padding:0 34px;font:inherit;font-size:16px;color:var(--label)}
 .search input::placeholder{color:var(--label2)}
-.search input:focus{outline:none;background:var(--fill2)}
+.search input:focus{background:var(--fill2)}
+.search input:focus-visible{outline-offset:0}
 .search > svg{position:absolute;left:11px;top:10px;width:16px;height:16px;color:var(--label2);pointer-events:none}
 .search .clr{position:absolute;right:8px;top:8px;width:20px;height:20px;border:0;border-radius:10px;background:var(--label3);color:var(--card);display:grid;place-items:center;padding:0}
 .search .clr[hidden]{display:none}
@@ -237,22 +256,23 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .chips::-webkit-scrollbar{display:none}
 .chips .pickChip{flex:none;display:inline-flex;align-items:center;gap:6px}
 .chips .cnt{font-size:12px;color:var(--label2);font-variant-numeric:tabular-nums}
-.chips .pickChip.on .cnt{color:rgba(255,255,255,.75)}
+.chips .pickChip.on .cnt{color:var(--onAccentDim)}
 .summary.compact .sumTotal{font-size:28px;margin-top:4px}
 .summary.compact .sumTotal small{font-size:16px}
 .dayHead{display:flex;justify-content:space-between;margin:18px 32px 6px;font-size:13px;color:var(--label2);font-variant-numeric:tabular-nums}
 .empty{padding:28px 20px;text-align:center;color:var(--label2);font-size:15px}
 .empty button{margin-top:12px}
-.primary{display:block;width:100%;height:50px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-size:17px;font-weight:600}
+.primary{display:block;width:100%;height:50px;border:0;border-radius:12px;background:var(--accentFill);color:var(--onAccent);font-size:17px;font-weight:600}
 .primary:active{opacity:.8}
-.inlineBtn{height:36px;padding:0 18px;border:0;border-radius:18px;background:var(--blue);color:#fff;font-size:15px;font-weight:600}
+.inlineBtn{height:36px;padding:0 18px;border:0;border-radius:18px;background:var(--accentFill);color:var(--onAccent);font-size:15px;font-weight:600}
+.inlineBtn:active{opacity:.8}
 .more{font-size:13px;color:var(--label2);text-align:center;margin:12px 16px}
 
 /* ---------- Tab bar ---------- */
-.tabbar{display:flex;background:var(--bar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+.tabbar{display:flex;background:var(--bar);
   border-top:.5px solid var(--sep);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tab{flex:1;border:0;background:none;padding:7px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;
-  font-size:10px;font-weight:500;color:#8E8E93}
+  font-size:10px;font-weight:500;color:var(--tabIdle)}
 .tab.active{color:var(--blue)}
 .tab svg{width:26px;height:26px}
 
@@ -262,9 +282,9 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .side-right .mic{grid-column:1}
 .mic svg{width:24px;height:24px}
 .mic:active{transform:scale(.94)}
-.mic.on{background:var(--red);color:#fff;animation:micPulse 1.2s infinite}
+.mic.on{background:var(--dangerFill);color:var(--onAccent);animation:micPulse 1.2s infinite}
 .mic.wait{background:var(--fill2);color:var(--label2);animation:pulse 1s infinite}
-@keyframes micPulse{0%{box-shadow:0 0 0 0 rgba(255,59,48,.45)}100%{box-shadow:0 0 0 16px rgba(255,59,48,0)}}
+@keyframes micPulse{0%{box-shadow:0 0 0 0 var(--redGlow)}100%{box-shadow:0 0 0 16px var(--redGlow0)}}
 .heard{margin:0;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;color:var(--label);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .heard span:last-child{overflow:hidden;text-overflow:ellipsis}
@@ -287,16 +307,16 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .textBtn:disabled{color:var(--label3)}
 
 /* ---------- Toast ---------- */
-.toast{max-width:calc(100vw - 24px);position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);transform:translate(-50%,20px);opacity:0;pointer-events:none;
+.toast{max-width:calc(100% - 24px);position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);transform:translate(-50%,20px);opacity:0;pointer-events:none;
   display:flex;align-items:center;gap:14px;padding:10px 10px 10px 18px;border-radius:24px;min-height:50px;
   background:var(--material);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  box-shadow:0 8px 30px rgba(0,0,0,.14),0 0 0 .5px var(--sep);font-size:15px;font-weight:500;
-  transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1.2);white-space:nowrap;z-index:60}
+  box-shadow:var(--shadowPop),0 0 0 .5px var(--sep);font-size:15px;font-weight:500;
+  transition:opacity .2s,transform .25s var(--ease-out);white-space:nowrap;z-index:60}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .toast button{border:0;background:var(--fill);color:var(--blue);font-size:15px;font-weight:600;height:30px;padding:0 12px;border-radius:15px}
 
 /* ---------- Sheets ---------- */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
+.overlay{position:fixed;inset:0;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
 .overlay.show{opacity:1;pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;background:var(--bg);border-radius:14px 14px 0 0;
   transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.9,.25,1);z-index:50;
@@ -313,6 +333,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .field span{display:block;font-size:13px;color:var(--label2);margin-bottom:2px}
 .field input{width:100%;border:0;background:none;font:inherit;font-size:17px;color:var(--label);padding:2px 0;min-height:26px}
 .field input:focus{outline:none}
+.field input:focus-visible{outline:none}
 .field input.big{font-size:28px;font-weight:600;font-variant-numeric:tabular-nums}
 .foot{font-size:13px;color:var(--label2);margin:8px 16px 16px;line-height:1.4}
 .groupLabel{font-size:13px;color:var(--label2);margin:22px 16px 8px}
@@ -325,27 +346,35 @@ button.setRow:active{background:var(--fill)}
 .dangerBtn{display:block;width:100%;height:50px;border:0;border-radius:12px;background:var(--card);color:var(--red);font-size:17px;margin-top:24px}
 .catPick{display:flex;flex-wrap:wrap;gap:8px}
 .pickChip{height:36px;padding:0 12px;border:0;border-radius:18px;background:var(--card);font-size:15px;box-shadow:0 0 0 .5px var(--sep)}
-.pickChip.on{background:var(--blue);color:#fff;box-shadow:none}
+.pickChip.on{background:var(--accentFill);color:var(--onAccent);box-shadow:none}
 
 /* Sửa danh mục */
 .catRow{display:flex;align-items:center;gap:10px;padding:8px 12px;position:relative}
 .catRow + .catRow::before,.emojiPanel + .catRow::before{content:"";position:absolute;top:0;left:58px;right:0;border-top:.5px solid var(--sep)}
 .catRow .ic{flex:none;width:36px;height:36px;border:0;border-radius:18px;font-size:19px;display:grid;place-items:center}
 .catRow input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:17px;color:var(--label);padding:6px 0}
-.catRow input:focus{outline:none}
+.catRow input:focus,.catRow input:focus-visible{outline:none}
 .miniBtn{flex:none;width:30px;height:30px;border:0;border-radius:15px;background:var(--fill);display:grid;place-items:center;color:var(--label2)}
-.miniBtn:disabled{opacity:.35}
-.miniBtn.danger{background:var(--red);color:#fff}
+.miniBtn:disabled{background:var(--fill);color:var(--label3)}
+.miniBtn.danger{background:var(--dangerFill);color:var(--onAccent)}
 .miniBtn svg{width:14px;height:14px}
 .emojiPanel{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:2px;padding:4px 12px 10px}
 .emojiPanel button{height:38px;border:0;border-radius:10px;background:none;font-size:22px}
 .emojiPanel button:active{background:var(--fill2)}
-.addRow{display:block;width:100%;margin-top:12px;height:48px;border:0;border-radius:12px;background:var(--card);color:var(--blue);font-size:17px}
+.addRow{display:block;width:100%;margin-top:12px;height:48px;border:0;border-radius:12px;background:var(--card);color:var(--blue);font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 16px}
+.addRow:active{background:var(--fill)}
 
 .asheet{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);max-width:520px;margin:0 auto;z-index:50;
   transform:translateY(120%);transition:transform .3s cubic-bezier(.2,.9,.25,1)}
 .asheet.show{transform:none}
 
+@media (hover:hover){
+  .key:hover{background:var(--keyHover)} .key.del:hover{background:var(--fill)} .cat:hover .ic{transform:scale(1.06)}
+  .chip:hover,.pickChip:not(.on):hover,.row:hover,button.setRow:hover,.bstrip:hover,.addRow:hover,.dangerBtn:hover{background:var(--fill)}
+  .primary:hover,.inlineBtn:hover{opacity:.9} .textBtn:not(:disabled):hover,.linkRow:hover{text-decoration:underline}
+  .tab:not(.active):hover{color:var(--label)} .iconbtn:hover,.navBtn:not(:disabled):hover,.miniBtn:not(:disabled):hover,.mic:not(.on):hover{background:var(--fill2)}
+  .seg button:not(.on):hover{background:var(--fill)}
+}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 @media (max-height:700px){
   #vAdd{--k:min(60px,16vw);--gx:14px;--gy:7px}
@@ -510,7 +539,7 @@ button.setRow:active{background:var(--fill)}
     <p class="foot" id="cfgStatus"></p>
     <button class="primary" id="cfgSave">Lưu và đồng bộ</button>
     <a class="linkRow" id="sheetLink" target="_blank" rel="noopener" hidden>Mở Google Sheet</a>
-    <p class="foot" style="text-align:center">Phiên bản 13</p>
+    <p class="foot" style="text-align:center">Phiên bản 14</p>
 
     <p class="groupLabel">Tùy chỉnh</p>
     <div class="group">
@@ -1220,14 +1249,14 @@ function handleVoice(text) {
     const undo = () => saved.forEach(it => removeExpense(it.id));
     if (saved.length === 1) {
       const it = saved[0], past = sod(new Date(it.ts)).getTime() !== sod(new Date()).getTime();
-      toast(`🎙 Đã lưu ${catOf(it.cat).icon} ${fmt(it.amount)} ₫${it.note ? ', ' + it.note : ''}${past ? ` (${dayLabel(new Date(it.ts)).toLowerCase()})` : ''}`, undo);
+      toast(`Đã lưu ${catOf(it.cat).icon} ${fmt(it.amount)} ₫${it.note ? ', ' + it.note : ''}${past ? ` (${dayLabel(new Date(it.ts)).toLowerCase()})` : ''}`, undo);
     } else {
-      toast(`🎙 Đã lưu ${saved.length} khoản, ${fmt(saved.reduce((a, i) => a + i.amount, 0))} ₫`, undo);
+      toast(`Đã lưu ${saved.length} khoản, ${fmt(saved.reduce((a, i) => a + i.amount, 0))} ₫`, undo);
     }
     flush();
   } else if (todo.length) {
     const p = todo[0];
-    toast(p.amount ? `🎙 "${p.text}". Chạm danh mục để lưu` : `🎙 "${p.text}". Chưa nghe ra số tiền`);
+    toast(p.amount ? `"${p.text}". Chạm danh mục để lưu` : `"${p.text}". Chưa nghe ra số tiền`);
   }
 }
 
@@ -1403,7 +1432,7 @@ function renderStatsView() {
   const list = catFilter ? all.filter(i => i.cat === catFilter) : all;
   const total = sum(list);
 
-  $('#periodLabel').textContent = periodLabel(period, offset, r) + (catFilter ? ` · ${catFilter}` : '');
+  $('#periodLabel').textContent = periodLabel(period, offset, r) + (catFilter ? `, ${catFilter}` : '');
   $('#nextP').disabled = offset >= 0;
   $('#sumTotal').innerHTML = `${fmt(total)}<small>₫</small>`;
 
@@ -1435,7 +1464,7 @@ function renderStatsView() {
   $('#clearFilter').hidden = !catFilter;
   $('#catList').innerHTML = catRows.length ? catRows.map(([name, o]) => {
     const c = catOf(name), pct = allTotal ? o.v / allTotal * 100 : 0, pv = prevByCat.get(name) || 0;
-    const sub = `${o.n} khoản · TB ${fmt(o.v / o.n)} ₫` + (pv > 0 ? ` · ${pctTxt(o.v, pv)}` : '');
+    const sub = `${o.n} khoản, TB ${fmt(o.v / o.n)} ₫` + (pv > 0 ? `, ${pctTxt(o.v, pv)}` : '');
     return `<button class="row${catFilter === name ? ' selected' : ''}" data-cat="${esc(name)}">
       <span class="ic" style="background:${tint(c.color)}">${c.icon}</span>
       <span class="main"><span class="t">${esc(name)}</span><span class="s">${sub}</span>
@@ -1511,6 +1540,21 @@ function renderKpis(ctx) {
     [`${noSpend}/${dayed.length}`, 'ngày không chi'],
   ].map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
 }
+
+/* Biểu tượng vẽ cho từng loại nhận xét; danh mục vẫn dùng biểu tượng người dùng chọn */
+const insightSvg = d => `<svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const INSIGHT_IC = {
+  '🔮': insightSvg('<path d="M3 15l4.5-4.5 3 3L17 7"/><path d="M12.5 7H17v4.5"/>'),
+  '📅': insightSvg('<rect x="3" y="4.5" width="14" height="12.5" rx="2"/><path d="M3 8.5h14M7 2.5v4M13 2.5v4"/>'),
+  '💥': insightSvg('<path d="M10 16.5v-13M5 8.5l5-5 5 5"/>'),
+  '🪙': insightSvg('<circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3.5"/>'),
+  '🎉': insightSvg('<circle cx="10" cy="10" r="3.2"/><path d="M10 2.5v1.8M10 15.7v1.8M2.5 10h1.8M15.7 10h1.8M4.7 4.7l1.3 1.3M14 14l1.3 1.3M4.7 15.3 6 14M14 6l1.3-1.3"/>'),
+  '🧘': insightSvg('<path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8Z"/>'),
+  '🕒': insightSvg('<circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2"/>'),
+  '📍': insightSvg('<path d="M10 17.5s5.5-5 5.5-9a5.5 5.5 0 0 0-11 0c0 4 5.5 9 5.5 9Z"/><circle cx="10" cy="8.5" r="2"/>'),
+  '🌿': insightSvg('<circle cx="10" cy="10" r="7"/><path d="m7 10 2 2 4-4"/>'),
+  '✏️': insightSvg('<path d="M13 3.5 16.5 7 7 16.5H3.5V13Z"/><path d="m11 5.5 3.5 3.5"/>'),
+};
 
 /* ---------- Nhận xét tự động về hành vi ----------
    Mỗi nhận xét chỉ hiện khi dữ liệu đủ rõ; tối đa 8 dòng. */
@@ -1629,7 +1673,7 @@ function renderInsights(ctx) {
     add('✏️', `${perDay.toFixed(1)} khoản mỗi ngày`, `Có chi ${spent.size}/${dayed.length} ngày trong kỳ, trung bình <b>${fmt(total / Math.max(1, spent.size))} ₫</b> cho mỗi ngày có chi.`);
   }
 
-  $('#insights').innerHTML = out.slice(0, 8).map(o => `<div class="insight"><span class="ic">${o.ic}</span><span class="main"><div class="t">${o.t}</div><div class="s">${o.s}</div></span></div>`).join('')
+  $('#insights').innerHTML = out.slice(0, 8).map(o => `<div class="insight"><span class="ic">${INSIGHT_IC[o.ic] || o.ic}</span><span class="main"><div class="t">${o.t}</div><div class="s">${o.s}</div></span></div>`).join('')
     || '<div class="empty">Ghi thêm vài khoản chi nữa để có nhận xét.</div>';
 }
 
@@ -1688,7 +1732,7 @@ function renderSizes(ctx) {
   $('#sizeCard').innerHTML = `<p class="miniCap" style="padding:12px 16px 0">${cap}</p>` + rows.map(x => `
     <div class="row" style="padding-top:8px;padding-bottom:8px">
       <span class="main"><span class="t" style="font-size:15px">${x.name}</span>
-        <span class="s">${x.n ? `${x.n} khoản · ${Math.round(x.n / list.length * 100)}% số lần` : 'Không có'}</span>
+        <span class="s">${x.n ? `${x.n} khoản, ${Math.round(x.n / list.length * 100)}% số lần` : 'Không có'}</span>
         <span class="meter"><i style="width:${maxV ? (x.v / maxV * 100).toFixed(1) : 0}%;background:var(--blue)"></i></span></span>
       <span class="amt">${x.n ? fmt(x.v) + ' ₫' : '—'}<span class="s">${x.n && total ? Math.round(x.v / total * 100) + '%' : ''}</span></span>
     </div>`).join('');
@@ -1701,7 +1745,7 @@ function renderPlaces(ctx) {
   $('#placeCard').innerHTML = tn.map(x => {
     const c = catOf(x.cat);
     return `<div class="row"><span class="ic" style="background:${tint(c.color)}">${c.icon}</span>
-      <span class="main"><span class="t">${esc(x.name)}</span><span class="s">${x.n} lần · TB ${fmt(x.v / x.n)} ₫</span></span>
+      <span class="main"><span class="t">${esc(x.name)}</span><span class="s">${x.n} lần, TB ${fmt(x.v / x.n)} ₫</span></span>
       <span class="amt">${fmt(x.v)} ₫</span></div>`;
   }).join('');
 }
@@ -1778,7 +1822,7 @@ function txListHtml(list) {
       const c = catOf(i.cat), t = new Date(i.ts);
       return `<button class="row" data-id="${esc(i.id)}">
         <span class="ic" style="background:${tint(c.color)}">${c.icon}</span>
-        <span class="main"><span class="t">${esc(i.note || i.cat)}</span><span class="s">${i.note ? esc(i.cat) + ', ' : ''}${pad2(t.getHours())}:${pad2(t.getMinutes())}${i.receipt ? ' 🧾' : ''}</span></span>
+        <span class="main"><span class="t">${esc(i.note || i.cat)}</span><span class="s">${i.note ? esc(i.cat) + ', ' : ''}${pad2(t.getHours())}:${pad2(t.getMinutes())}${i.receipt ? ', có hóa đơn' : ''}</span></span>
         <span class="amt">${fmt(i.amount)} ₫</span>
         <svg class="chev" viewBox="0 0 8 14" width="8" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m1 1 6 6-6 6"/></svg></button>`;
     }).join('') + '</div>';
@@ -1924,7 +1968,7 @@ $('#rcSave').addEventListener('click', () => {
   const item = createExpense(rc.cat, amt, $('#rcNote').value.trim(), null, { at: isNaN(t) ? new Date() : t, receipt: rc.url || '' });
   rc = null; closeSheet();
   renderAmount(); haptic();
-  toast(`🧾 Đã lưu ${catOf(item.cat).icon} ${fmt(amt)} ₫`, () => removeExpense(item.id));
+  toast(`Đã lưu ${catOf(item.cat).icon} ${fmt(amt)} ₫`, () => removeExpense(item.id));
   flush();
 });
 
@@ -2173,7 +2217,7 @@ function renderBudgetStrip() {
   el.className = 'bstrip ' + lvl;
   const pre = extra ? 'Sau khoản này còn ' : 'Tháng này còn ';
   $('#bLeft').textContent = s.left >= 0 ? `${pre}${fmt(s.left)} ₫` : `${extra ? 'Sau khoản này vượt' : 'Đã vượt'} ${fmt(-s.left)} ₫`;
-  $('#bRight').textContent = s.left > 0 && s.remain > 0 ? `≈ ${short(s.perDay)}/ngày · ${s.remain} ngày` : `${Math.round(s.ratio * 100)}% ngân sách`;
+  $('#bRight').textContent = s.left > 0 && s.remain > 0 ? `≈ ${short(s.perDay)}/ngày, ${s.remain} ngày` : `${Math.round(s.ratio * 100)}% ngân sách`;
   $('#bFill').style.width = Math.min(100, base.ratio * 100).toFixed(1) + '%';
   $('#bGhost').style.width = Math.min(100, s.ratio * 100).toFixed(1) + '%';
   $('#bPace').style.left = (s.pace * 100).toFixed(1) + '%';
@@ -2240,7 +2284,7 @@ function renderBudgetCard() {
     html += `<div class="brows" style="margin:10px -16px -12px">` + s.cats.sort((a, b) => b.ratio - a.ratio).map(c => {
       const cc = catOf(c.name);
       return `<button class="row" data-cat="${esc(c.name)}"><span class="ic" style="background:${tint(cc.color)}">${cc.icon}</span>
-        <span class="main"><span class="t">${esc(c.name)}</span><span class="s">${fmt(c.spent)} / ${fmt(c.total)} ₫ · ${Math.round(c.ratio * 100)}%</span>
+        <span class="main"><span class="t">${esc(c.name)}</span><span class="s">${fmt(c.spent)} / ${fmt(c.total)} ₫, ${Math.round(c.ratio * 100)}%</span>
           <span class="bmeter ${c.level}" style="margin:6px 0 0;height:4px;border-radius:2px"><i style="width:${Math.min(100, c.ratio * 100).toFixed(1)}%"></i></span></span>
         <span class="amt ${c.left < 0 ? 'up' : ''}">${c.left >= 0 ? 'còn ' + fmt(c.left) : 'vượt ' + fmt(-c.left)}<span class="s">₫</span></span></button>`;
     }).join('') + '</div>';
